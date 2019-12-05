@@ -18,9 +18,6 @@ public:
 
 	GhostObject(Shape *shape);
 
-	void getTransform(btScalar *a16);
-
-	void setTransform(btScalar *a16);
 private:
 	btPairCachingGhostObject *pair_caching_ghost_object;
 };

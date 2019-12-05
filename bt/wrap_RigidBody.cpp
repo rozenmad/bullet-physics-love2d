@@ -1,4 +1,5 @@
 #include "wrap_RigidBody.h"
+#include "wrap_CollisionObject.h"
 #include "Physics3D.h"
 
 namespace love
@@ -11,37 +12,6 @@ namespace bt
 RigidBody *luax_checkrigidbody(lua_State *L, int idx)
 {
 	return luax_checktype<RigidBody>(L, idx);
-}
-
-int w_RigidBody_getTransform(lua_State *L)
-{
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	btScalar a16[16];
-	rbody->getTransform(a16);
-	int idx = 2;
-	if( lua_istable(L, idx) ) {
-		for( int i = 0; i < 16; i++ ) {
-			lua_pushnumber(L, a16[i]);
-			lua_rawseti(L, idx, i+1);
-		}
-	}
-	return 0;
-}
-
-int w_RigidBody_setTransform(lua_State *L)
-{
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	btScalar a16[16];
-	int idx = 2;
-	if( lua_istable(L, idx) ) {
-		for( int i = 0; i < 16; i++ ) {
-			lua_rawgeti(L, idx, i+1);
-			a16[i] = (float)luaL_checknumber(L, -1);
-			lua_pop(L, 1);
-		}
-		rbody->setTransform(a16);
-	}
-	return 0;
 }
 
 int w_RigidBody_setDamping(lua_State *L)
@@ -123,30 +93,8 @@ int w_RigidBody_setLinearVelocity(lua_State *L) {
 	return 0;
 }
 
-int w_Body_setUserData(lua_State *L)
-{
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	lua_remove(L, 1);
-	return rbody->setUserData(L);
-}
-
-int w_Body_getUserData(lua_State *L)
-{
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	lua_remove(L, 1);
-	return rbody->getUserData(L);
-}
-
-int w_Body_setCallback(lua_State *L) {
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	lua_remove(L, 1);
-	return rbody->setCallback(L);
-}
-
 static const luaL_Reg w_RigidBody_functions[] =
 {
-	{ "getTransform", w_RigidBody_getTransform },
-	{ "setTransform", w_RigidBody_setTransform },
 	{ "setDamping", w_RigidBody_setDamping },
 	{ "setRestitution", w_RigidBody_setRestitution },
 	{ "applyForce", w_RigidBody_applyForce },
@@ -156,15 +104,12 @@ static const luaL_Reg w_RigidBody_functions[] =
 	{ "activate", w_RigidBody_activate },
 	{ "getLinearVelocity", w_RigidBody_getLinearVelocity },
 	{ "setLinearVelocity", w_RigidBody_setLinearVelocity },
-	{ "setUserData", w_Body_setUserData },
-	{ "getUserData", w_Body_getUserData },
-	{ "setCallback", w_Body_setCallback },
 	{ 0, 0 }
 };
 
 extern "C" int luaopen_bt_rigidbody(lua_State *L)
 {
-	return luax_register_type(L, &RigidBody::type, w_RigidBody_functions, nullptr);
+	return luax_register_type(L, &RigidBody::type, w_CollisionObject_functions, w_RigidBody_functions, nullptr);
 }
 
 }

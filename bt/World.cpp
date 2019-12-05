@@ -42,11 +42,11 @@ void World::update(float time_step, int max_sub_steps) {
 
 		int contacts = contactManifold->getNumContacts();
 		if( contacts > 0 ) {
-			RigidBody *rbodyA = ((UserData*)obA->getUserPointer())->rbody;
-			RigidBody *rbodyB = ((UserData*)obB->getUserPointer())->rbody;
+			CollisionObject *objA = ((UserData*)obA->getUserPointer())->obj;
+			CollisionObject *objB = ((UserData*)obB->getUserPointer())->obj;
 
-			rbodyA->contact_callback.report(this, contactManifold, rbodyA, rbodyB);
-			rbodyB->contact_callback.report(this, contactManifold, rbodyB, rbodyA);
+			objA->contact_callback.report(this, contactManifold, objA, objB);
+			objB->contact_callback.report(this, contactManifold, objB, objA);
 
 			/*for( int j = 0; j < contacts; j++ ) {
 				btManifoldPoint& pt = contactManifold->getContactPoint(j);
@@ -70,7 +70,6 @@ void World::update(float time_step, int max_sub_steps, float fixed_time_step) {
 void World::addRigidBody(RigidBody *rbody) {
 	rbody->world = this;
 	world->addRigidBody(rbody->rbody);
-	rbody->in_world = true;
 
 	object_list[rbody] = this;
 }

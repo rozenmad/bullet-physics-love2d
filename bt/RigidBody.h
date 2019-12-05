@@ -8,6 +8,7 @@
 
 #include "World.h"
 #include "Shape.h"
+#include "CollisionObject.h"
 
 namespace love
 {
@@ -15,12 +16,6 @@ namespace physics3d
 {
 namespace bt
 {
-
-struct UserData
-{
-	RigidBody *rbody = nullptr;
-	Reference *reference = nullptr;
-};
 
 class RigidBody;
 
@@ -37,25 +32,15 @@ private:
 	lua_State *L;
 };
 
-class RigidBody : public Object {
+class RigidBody : public CollisionObject {
 public:
 	friend class World;
 	friend class MotionState;
-
-	struct ContactCallback {
-		Reference *reference = nullptr;
-		lua_State *L = nullptr;
-		int report(World *world, btPersistentManifold *manifold, RigidBody *a, RigidBody *b);
-	};
 
 	static love::Type type;
 
 	RigidBody(Shape *shape, float mass, lua_State *L);
 	virtual ~RigidBody();
-
-	void getTransform(btScalar *a16);
-
-	void setTransform(btScalar *a16);
 
 	void setDamping(btScalar linear, btScalar angular);
 
@@ -73,27 +58,18 @@ public:
 	const btVector3 &getLinearVelocity() const;
 	void setLinearVelocity(btVector3 const &v);
 
-	int setUserData(lua_State *L);
-	int getUserData(lua_State *L);
-
-	int setCallback(lua_State *L);
+private:
+	btRigidBody *create_bt_rigid_body(Shape *shape, float mass, lua_State *L);
 
 private:
-	btRigidBody* rbody;
+	btRigidBody *rbody;
 	btMotionState *motion_state;
-	World *world;
-
-	ContactCallback contact_callback;
 
 	StrongRef<Shape> shape_reference;
-
-	UserData *userdata;
-
-	bool in_world;
 };
 
-}
-}
-}
+} // bt
+} // physics3d
+} // love
 
 #endif // LOVE_PHYSICS3D_BT_RIGIDBODY_H
