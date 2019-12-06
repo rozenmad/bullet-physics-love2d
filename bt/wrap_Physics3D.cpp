@@ -5,9 +5,11 @@
 #include "wrap_RigidBody.h"
 #include "wrap_Shape.h"
 #include "wrap_BoxShape.h"
+#include "wrap_CapsuleShape.h"
 #include "wrap_TriangleMeshShape.h"
 #include "wrap_ContactPoint.h"
 #include "wrap_CollisionObject.h"
+#include "wrap_GhostObject.h"
 
 namespace love
 {
@@ -26,6 +28,16 @@ int w_newWorld(lua_State *L) {
 	luax_catchexcept(L, [&](){ w = new World(gx, gy, gz); });
 	luax_pushtype(L, w);
 	w->release();
+	return 1;
+}
+
+int w_newGhostObject(lua_State *L) {
+	Shape *shape = luax_checkshape(L, 1);
+	GhostObject *object;
+
+	luax_catchexcept(L, [&](){ object = new GhostObject(shape); });
+	luax_pushtype(L, object);
+	object->release();
 	return 1;
 }
 
@@ -55,6 +67,17 @@ int w_newBoxShape(lua_State *L) {
 	return 1;
 }
 
+int w_newCapsuleShape(lua_State *L) {
+	float radius = (float)luaL_checknumber(L, 1);
+	float height = (float)luaL_checknumber(L, 2);
+
+	CapsuleShape *shape;
+	luax_catchexcept(L, [&](){ shape = new CapsuleShape(radius, height); });
+	luax_pushtype(L, shape);
+	shape->release();
+	return 1;
+}
+
 int w_newTriangleMeshShape(lua_State *L) {
 	if( lua_istable(L, 1) ) {
 		TriangleMeshShape *shape;
@@ -71,8 +94,10 @@ int w_newTriangleMeshShape(lua_State *L) {
 static const luaL_Reg functions[] =
 {
 	{ "newWorld", w_newWorld },
+	{ "newGhostObject", w_newGhostObject },
 	{ "newRigidBody", w_newRigidBody },
 	{ "newBoxShape", w_newBoxShape },
+	{ "newCapsuleShape", w_newCapsuleShape },
 	{ "newTriangleMeshShape", w_newTriangleMeshShape },
 	{ 0, 0 }
 };
@@ -80,10 +105,12 @@ static const luaL_Reg functions[] =
 static const lua_CFunction types[] =
 {
 	luaopen_bt_world,
+	luaopen_bt_ghostobject,
 	luaopen_bt_rigidbody,
 	luaopen_bt_shape,
 	luaopen_bt_boxshape,
 	luaopen_bt_trianglemeshshape,
+	luaopen_bt_capsuleshape,
 	luaopen_bt_contactpoint,
 	luaopen_bt_collisionobject,
 	0

@@ -14,6 +14,7 @@ namespace bt
 {
 
 class RigidBody;
+class CollisionObject;
 
 class World : public Object {
 public:
@@ -25,6 +26,10 @@ public:
 	void update(float time_step, int max_sub_steps, float fixed_time_step);
 
 	void addRigidBody(RigidBody *rbody);
+
+	void addCollisionObject(CollisionObject *object);
+
+	btDispatcher *getDispatcher();
 
 	love::Object *findObject(void *rbody) const;
 

@@ -62,16 +62,10 @@ int w_RigidBody_setKinematic(lua_State *L) {
 	if( lua_isnoneornil(L, 2) ) {
 		rbody->setKinematic();
 	} else {
-		bool enable = (bool)lua_toboolean(L, 2);
+		bool enable = luax_toboolean(L, 2);
 		rbody->setKinematic(enable);
 	}
 
-	return 0;
-}
-
-int w_RigidBody_activate(lua_State *L) {
-	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	rbody->activate();
 	return 0;
 }
 
@@ -96,12 +90,10 @@ int w_RigidBody_setLinearVelocity(lua_State *L) {
 static const luaL_Reg w_RigidBody_functions[] =
 {
 	{ "setDamping", w_RigidBody_setDamping },
-	{ "setRestitution", w_RigidBody_setRestitution },
 	{ "applyForce", w_RigidBody_applyForce },
 	{ "setAngularFactor", w_RigidBody_setAngularFactor },
 	{ "setLinearFactor", w_RigidBody_setLinearFactor },
 	{ "setKinematic", w_RigidBody_setKinematic },
-	{ "activate", w_RigidBody_activate },
 	{ "getLinearVelocity", w_RigidBody_getLinearVelocity },
 	{ "setLinearVelocity", w_RigidBody_setLinearVelocity },
 	{ 0, 0 }

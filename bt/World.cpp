@@ -1,5 +1,6 @@
 #include "World.h"
 #include "RigidBody.h"
+#include "CollisionObject.h"
 
 namespace love
 {
@@ -70,8 +71,15 @@ void World::update(float time_step, int max_sub_steps, float fixed_time_step) {
 void World::addRigidBody(RigidBody *rbody) {
 	rbody->world = this;
 	world->addRigidBody(rbody->rbody);
+}
 
-	object_list[rbody] = this;
+void World::addCollisionObject(CollisionObject *object) {
+	object->world = this;
+	world->addCollisionObject(object->collision_object);
+}
+
+btDispatcher *World::getDispatcher() {
+	return world->getDispatcher();
 }
 
 love::Object *World::findObject(void *rbody) const

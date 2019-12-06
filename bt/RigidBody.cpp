@@ -57,9 +57,9 @@ btRigidBody *RigidBody::create_bt_rigid_body(Shape *shape, float mass, lua_State
 }
 
 RigidBody::RigidBody(Shape *shape, float mass, lua_State *L) :
-	CollisionObject(create_bt_rigid_body(shape, mass, L))
+	CollisionObject(create_bt_rigid_body(shape, mass, L), shape)
 {
-	shape_reference.set(shape);
+
 }
 
 RigidBody::~RigidBody()
@@ -69,10 +69,6 @@ RigidBody::~RigidBody()
 
 void RigidBody::setDamping(btScalar linear, btScalar angular) {
 	rbody->setDamping(linear, angular);
-}
-
-void RigidBody::setRestitution(float factor) {
-	rbody->setRestitution(factor);
 }
 
 void RigidBody::applyForce(btVector3 const &force, btVector3 const &rel_pos) {
@@ -95,10 +91,6 @@ void RigidBody::setKinematic(bool enable) {
 		rbody->setCollisionFlags(flags &~btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
     rbody->forceActivationState(enable ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
-}
-
-void RigidBody::activate(bool forceActivation) {
-	rbody->activate();
 }
 
 const btVector3 &RigidBody::getLinearVelocity() const {

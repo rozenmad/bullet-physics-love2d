@@ -6,7 +6,6 @@
 #include "common/Reference.h"
 #include "btBulletDynamicsCommon.h"
 
-#include "World.h"
 #include "Shape.h"
 #include "CollisionObject.h"
 
@@ -44,7 +43,6 @@ public:
 
 	void setDamping(btScalar linear, btScalar angular);
 
-	void setRestitution(float factor);
 	void applyForce(btVector3 const &force, btVector3 const &rel_pos);
 
 	void setAngularFactor(const btVector3 &factor);
@@ -52,8 +50,6 @@ public:
 	void setLinearFactor(const btVector3 &factor);
 
 	void setKinematic(bool enable = true);
-
-	void activate(bool forceActivation = false);
 
 	const btVector3 &getLinearVelocity() const;
 	void setLinearVelocity(btVector3 const &v);
@@ -64,8 +60,6 @@ private:
 private:
 	btRigidBody *rbody;
 	btMotionState *motion_state;
-
-	StrongRef<Shape> shape_reference;
 };
 
 } // bt

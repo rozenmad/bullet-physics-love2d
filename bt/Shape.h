@@ -26,6 +26,10 @@ public:
 	
 	Shape(btCollisionShape *shape);
 
+	btCollisionShape *getCollisionShape() {
+		return shape;
+	}
+
 	void setMargin(btScalar margin);
 
 	Type getType() const;

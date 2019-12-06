@@ -5,13 +5,8 @@
 #include "common/Module.h"
 #include "common/runtime.h"
 #include "common/Reference.h"
-#include "World.h"
 
-struct cpml_vec3 {
-	double x;
-	double y;
-	double z;
-};
+#include "btBulletDynamicsCommon.h"
 
 namespace love
 {
