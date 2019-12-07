@@ -10,6 +10,7 @@
 #include "wrap_ContactPoint.h"
 #include "wrap_CollisionObject.h"
 #include "wrap_GhostObject.h"
+#include "wrap_CharacterController.h"
 
 namespace love
 {
@@ -90,6 +91,17 @@ int w_newTriangleMeshShape(lua_State *L) {
 	return 1;
 }
 
+int w_newCharacterController(lua_State *L) {
+	GhostObject *ghost_object = luax_checkghostobject(L, 1);
+	float step_height = (float)luaL_checknumber(L, 2);
+
+	CharacterController *character_controller;
+	luax_catchexcept(L, [&](){ character_controller = new CharacterController(ghost_object, step_height); });
+	luax_pushtype(L, character_controller);
+	character_controller->release();
+	return 1;
+}
+
 // List of functions to wrap.
 static const luaL_Reg functions[] =
 {
@@ -99,6 +111,7 @@ static const luaL_Reg functions[] =
 	{ "newBoxShape", w_newBoxShape },
 	{ "newCapsuleShape", w_newCapsuleShape },
 	{ "newTriangleMeshShape", w_newTriangleMeshShape },
+	{ "newCharacterController", w_newCharacterController },
 	{ 0, 0 }
 };
 
@@ -113,6 +126,7 @@ static const lua_CFunction types[] =
 	luaopen_bt_capsuleshape,
 	luaopen_bt_contactpoint,
 	luaopen_bt_collisionobject,
+	luaopen_bt_charactercontroller,
 	0
 };
 

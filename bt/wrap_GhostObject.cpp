@@ -1,4 +1,5 @@
 #include "wrap_GhostObject.h"
+#include "wrap_CollisionObject.h"
 
 namespace love
 {
@@ -22,7 +23,7 @@ static const luaL_Reg w_GhostObject_functions[] =
 };
 
 extern "C" int luaopen_bt_ghostobject(lua_State *L) {
-	return luax_register_type(L, &GhostObject::type, w_GhostObject_functions, nullptr);
+	return luax_register_type(L, &GhostObject::type, w_CollisionObject_functions, w_GhostObject_functions, nullptr);
 }
 
 } // bt

@@ -57,6 +57,10 @@ CollisionObject::~CollisionObject() {
 	}
 }
 
+Shape *CollisionObject::getCollisionShape() {
+	return shape_reference.get();
+}
+
 void CollisionObject::getTransform(btScalar *a16) const {
 	auto &t = collision_object->getWorldTransform();
 	t.getOpenGLMatrix(a16);

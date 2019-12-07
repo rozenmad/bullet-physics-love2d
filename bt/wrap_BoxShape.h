@@ -3,7 +3,6 @@
 
 // LOVE
 #include "common/runtime.h"
-#include "common/Exception.h"
 #include "BoxShape.h"
 
 namespace love

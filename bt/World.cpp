@@ -1,6 +1,7 @@
 #include "World.h"
 #include "RigidBody.h"
 #include "CollisionObject.h"
+#include "CharacterController.h"
 
 namespace love
 {
@@ -23,6 +24,8 @@ World::World(float gx, float gy, float gz)
 
 	world = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
 	world->setGravity(btVector3(gx, gy, gz));
+
+	world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 	//world->getDispatchInfo().m_useContinuous = true;
     //world->getSolverInfo().m_splitImpulse = false;
     world->setSynchronizeAllMotionStates(true);
@@ -76,6 +79,13 @@ void World::addRigidBody(RigidBody *rbody) {
 void World::addCollisionObject(CollisionObject *object) {
 	object->world = this;
 	world->addCollisionObject(object->collision_object);
+}
+
+void World::addCharacterController(CharacterController *object) {
+	btPairCachingGhostObject *ghost_object = object->getGhostObject();
+
+	world->addCollisionObject(ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+    world->addAction(object->kinematic_character_controller);
 }
 
 btDispatcher *World::getDispatcher() {

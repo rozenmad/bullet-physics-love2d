@@ -1,0 +1,22 @@
+#ifndef LOVE_PHYSICS3D_BT_WRAP_CHARACTERCONTROLLER_H
+#define LOVE_PHYSICS3D_BT_WRAP_CHARACTERCONTROLLER_H
+
+// LOVE
+#include "common/runtime.h"
+#include "CharacterController.h"
+
+namespace love
+{
+namespace physics3d
+{
+namespace bt
+{
+
+CharacterController *luax_checkcharactercontroller(lua_State *L, int idx);
+extern "C" int luaopen_bt_charactercontroller(lua_State *L);
+
+} // bt
+} // physics3d
+} // love
+
+#endif // LOVE_PHYSICS3D_BT_WRAP_CHARACTERCONTROLLER_H

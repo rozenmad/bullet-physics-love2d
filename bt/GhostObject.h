@@ -19,6 +19,10 @@ public:
 
 	GhostObject(Shape *shape);
 
+	btPairCachingGhostObject *getObject() {
+		return pair_caching_ghost_object;
+	}
+
 private:
 	btPairCachingGhostObject *create_bt_pair_caching_ghost_object();
 	

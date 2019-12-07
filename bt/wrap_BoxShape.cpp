@@ -10,10 +10,7 @@ namespace bt
 
 BoxShape *luax_checkboxshape(lua_State *L, int idx)
 {
-	BoxShape *shape = luax_checktype<BoxShape>(L, idx);
-	//if (!w->isValid())
-	//	luaL_error(L, "Attempt to use destroyed world.");
-	return shape;
+	return luax_checktype<BoxShape>(L, idx);
 }
 
 int w_BoxShape_dummy(lua_State *L) {

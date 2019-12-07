@@ -1,6 +1,7 @@
 #include "wrap_World.h"
 #include "wrap_RigidBody.h"
 #include "wrap_CollisionObject.h"
+#include "wrap_CharacterController.h"
 
 namespace love
 {
@@ -45,11 +46,20 @@ int w_World_addCollisionObject(lua_State *L)
 	return 0;
 }
 
+int w_World_addCharacterController(lua_State *L)
+{
+	World *world = luax_checkworld(L, 1);
+	CharacterController *object = luax_checkcharactercontroller(L, 2);
+	world->addCharacterController(object);
+	return 0;
+}
+
 static const luaL_Reg w_World_functions[] =
 {
 	{ "update", w_World_update },
 	{ "addRigidBody", w_World_addRigidBody },
 	{ "addCollisionObject", w_World_addCollisionObject },
+	{ "addCharacterController", w_World_addCharacterController },
 	{ 0, 0 }
 };
 
