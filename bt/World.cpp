@@ -71,6 +71,24 @@ void World::update(float time_step, int max_sub_steps, float fixed_time_step) {
 	}
 }
 
+int World::raycast(lua_State *L, const btVector3 &origin, const btVector3 &direction, float max_distance, unsigned mask) {
+	btCollisionWorld::AllHitsRayResultCallback ray_callback(origin, origin + max_distance * direction);
+
+	world->rayTest(ray_callback.m_rayFromWorld, ray_callback.m_rayToWorld, ray_callback);
+
+	int size = ray_callback.m_collisionObjects.size();
+
+	lua_createtable(L, size, 0);
+	int table_index = lua_gettop(L);
+	for( int i = 0; i < size; i++ ) {
+        RaycastHit *hit = new RaycastHit(ray_callback, i, origin);
+        luax_pushtype(L, hit);
+        hit->release();
+        lua_rawseti(L, table_index, i + 1);
+    }
+    return 1;
+}
+
 void World::addRigidBody(RigidBody *rbody) {
 	rbody->world = this;
 	world->addRigidBody(rbody->rbody);

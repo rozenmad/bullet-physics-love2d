@@ -10,10 +10,9 @@ namespace bt
 
 love::Type CharacterController::type("btCharacterController", &Object::type);
 
-CharacterController::CharacterController(GhostObject *ghost_object, btScalar step_height)
+CharacterController::CharacterController(GhostObject *ghost_object, btScalar step_height, btVector3 const &up)
 {
 	ghost_object_reference.set(ghost_object);
-	btVector3 up(0, 1, 0);
 	Shape *shape = ghost_object->getCollisionShape();
 	btCollisionShape *bt_shape = shape->getCollisionShape();
 	if( !bt_shape->isConvex() ) {

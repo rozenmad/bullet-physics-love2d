@@ -21,7 +21,7 @@ public:
 
     static love::Type type;
     
-    CharacterController(GhostObject *ghost_object, btScalar step_height);
+    CharacterController(GhostObject *ghost_object, btScalar step_height, btVector3 const &up);
     virtual ~CharacterController();
 
     void jump(const btVector3 &v = btVector3(0, 0, 0));

@@ -2,6 +2,8 @@
 #include "wrap_RigidBody.h"
 #include "wrap_CollisionObject.h"
 #include "wrap_CharacterController.h"
+#include "wrap_RaycastHit.h"
+#include "Physics3D.h"
 
 namespace love
 {
@@ -28,6 +30,15 @@ int w_World_update(lua_State *L)
 		luax_catchexcept(L, [&](){ world->update(time_step, max_sub_steps, fixed_time_step); });
 	}
 	return 0;
+}
+
+int w_World_raycast(lua_State *L)
+{
+	World *world = luax_checkworld(L, 1);
+	btVector3 origin = Physics3D::parse_btVector3(L, 2);
+	btVector3 direction = Physics3D::parse_btVector3(L, 3);
+	float max_distance = (float)luaL_checknumber(L, 4);
+	return world->raycast(L, origin, direction, max_distance, 0);
 }
 
 int w_World_addRigidBody(lua_State *L)
@@ -57,6 +68,7 @@ int w_World_addCharacterController(lua_State *L)
 static const luaL_Reg w_World_functions[] =
 {
 	{ "update", w_World_update },
+	{ "raycast", w_World_raycast },
 	{ "addRigidBody", w_World_addRigidBody },
 	{ "addCollisionObject", w_World_addCollisionObject },
 	{ "addCharacterController", w_World_addCharacterController },

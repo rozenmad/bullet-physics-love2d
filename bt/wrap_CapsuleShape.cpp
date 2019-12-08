@@ -1,4 +1,5 @@
 #include "wrap_CapsuleShape.h"
+#include "wrap_Shape.h"
 
 namespace love
 {
@@ -22,7 +23,7 @@ static const luaL_Reg w_CapsuleShape_functions[] =
 };
 
 extern "C" int luaopen_bt_capsuleshape(lua_State *L) {
-	return luax_register_type(L, &CapsuleShape::type, w_CapsuleShape_functions, nullptr);
+	return luax_register_type(L, &CapsuleShape::type, w_Shape_functions, w_CapsuleShape_functions, nullptr);
 }
 
 } // bt
