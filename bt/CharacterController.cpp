@@ -54,8 +54,8 @@ btScalar CharacterController::getMaxPenetrationDepth() const {
 	return kinematic_character_controller->getMaxPenetrationDepth();
 }
 
-btPairCachingGhostObject *CharacterController::getGhostObject() {
-	return kinematic_character_controller->getGhostObject();
+GhostObject *CharacterController::getGhostObject() {
+	return ghost_object_reference.get();
 }
 
 bool CharacterController::onGround() const {

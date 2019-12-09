@@ -25,6 +25,7 @@ public:
 	static love::Type type;
 	
 	Shape(btCollisionShape *shape);
+	virtual ~Shape();
 
 	btCollisionShape *getCollisionShape() {
 		return shape;

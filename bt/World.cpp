@@ -15,20 +15,30 @@ love::Type World::type("btWorld", &Object::type);
 World::World(float gx, float gy, float gz) 
 {
 	m_collisionConfiguration = new btDefaultCollisionConfiguration();
-	//m_collisionConfiguration->setConvexConvexMultipointIterations();
-	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
 
+	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
 	m_broadphase = new btDbvtBroadphase();
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
-	m_solver = solver;
+
+	m_solver = new btSequentialImpulseConstraintSolver();
 
 	world = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
 	world->setGravity(btVector3(gx, gy, gz));
 
 	world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
-	//world->getDispatchInfo().m_useContinuous = true;
-    //world->getSolverInfo().m_splitImpulse = false;
     world->setSynchronizeAllMotionStates(true);
+}
+
+World::~World() {
+	for( auto &it: object_list ) {
+		it.second->release();
+	}
+	object_list.clear();
+
+	delete world;
+	delete m_solver;
+	delete m_broadphase;
+	delete m_dispatcher;
+	delete m_collisionConfiguration;
 }
 
 void World::update(float time_step, int max_sub_steps) {
@@ -89,21 +99,35 @@ int World::raycast(lua_State *L, const btVector3 &origin, const btVector3 &direc
     return 1;
 }
 
-void World::addRigidBody(RigidBody *rbody) {
-	rbody->world = this;
-	world->addRigidBody(rbody->rbody);
-}
-
-void World::addCollisionObject(CollisionObject *object) {
+void World::addRigidBody(RigidBody *object) {
 	object->world = this;
-	world->addCollisionObject(object->collision_object);
+	world->addRigidBody(object->rbody);
+	attachObject(object->collision_object, object);
+	object->retain();
 }
 
 void World::addCharacterController(CharacterController *object) {
-	btPairCachingGhostObject *ghost_object = object->getGhostObject();
+	GhostObject *ghost = object->getGhostObject();
+	ghost->world = this;
+	world->addCollisionObject(ghost->collision_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
+	attachObject(ghost->collision_object, ghost);
+	ghost->retain();
 
-	world->addCollisionObject(ghost_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
     world->addAction(object->kinematic_character_controller);
+    attachObject(object->kinematic_character_controller, object);
+    object->retain();
+}
+
+void World::removeRigidBody(CollisionObject *object) {
+	world->removeCollisionObject(object->collision_object);
+	detachObject(object->collision_object);
+	object->release();
+}
+
+void World::removeCharacterController(CharacterController *object) {
+	world->removeAction(object->kinematic_character_controller);
+	detachObject(object->kinematic_character_controller);
+	object->release();
 }
 
 btDispatcher *World::getDispatcher() {
@@ -117,6 +141,14 @@ love::Object *World::findObject(void *rbody) const
 		return it->second;
 	else
 		return nullptr;
+}
+
+void World::attachObject(void *bt_collision_object, love::Object *object) {
+	object_list[bt_collision_object] = object;
+}
+
+void World::detachObject(void *bt_collision_object) {
+	object_list.erase(bt_collision_object);
 }
 
 } // bt

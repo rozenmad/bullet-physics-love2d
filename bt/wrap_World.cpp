@@ -49,14 +49,6 @@ int w_World_addRigidBody(lua_State *L)
 	return 0;
 }
 
-int w_World_addCollisionObject(lua_State *L)
-{
-	World *world = luax_checkworld(L, 1);
-	CollisionObject *object = luax_checkcollisionobject(L, 2);
-	world->addCollisionObject(object);
-	return 0;
-}
-
 int w_World_addCharacterController(lua_State *L)
 {
 	World *world = luax_checkworld(L, 1);
@@ -65,13 +57,30 @@ int w_World_addCharacterController(lua_State *L)
 	return 0;
 }
 
+int w_World_removeRigidBody(lua_State *L)
+{
+	World *world = luax_checkworld(L, 1);
+	CollisionObject *object = luax_checkrigidbody(L, 2);
+	world->removeRigidBody(object);
+	return 0;
+}
+
+int w_World_removeCharacterController(lua_State *L)
+{
+	World *world = luax_checkworld(L, 1);
+	CharacterController *object = luax_checkcharactercontroller(L, 2);
+	world->removeCharacterController(object);
+	return 0;
+}
+
 static const luaL_Reg w_World_functions[] =
 {
 	{ "update", w_World_update },
 	{ "raycast", w_World_raycast },
 	{ "addRigidBody", w_World_addRigidBody },
-	{ "addCollisionObject", w_World_addCollisionObject },
 	{ "addCharacterController", w_World_addCharacterController },
+	{ "removeRigidBody", w_World_removeRigidBody },
+	{ "removeCharacterController", w_World_removeCharacterController },
 	{ 0, 0 }
 };
 

@@ -38,7 +38,7 @@ public:
 
     btScalar getMaxPenetrationDepth() const;
 
-    btPairCachingGhostObject *getGhostObject();
+    GhostObject *getGhostObject();
 
     bool onGround() const;
 

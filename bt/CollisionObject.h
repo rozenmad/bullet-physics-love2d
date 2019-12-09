@@ -37,8 +37,6 @@ public:
 
 	CollisionObject(btCollisionObject *collision_object, Shape *shape);
 	virtual ~CollisionObject();
-
-	Shape *getCollisionShape();
 	
 	void getTransform(btScalar *a16) const;
 	void setTransform(btScalar *a16);
@@ -74,6 +72,8 @@ public:
 	const btVector3 &getAnisotropicFriction() const;
 	bool hasAnisotropicFriction() const;
 
+	Shape *getCollisionShape();
+	
 	btScalar getContactProcessingThreshold() const;
 
 	btScalar getRestitution() const;

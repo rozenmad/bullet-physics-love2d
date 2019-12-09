@@ -25,6 +25,7 @@ public:
 	static love::Type type;
 
 	World(float gx, float gy, float gz);
+	virtual ~World();
 
 	void update(float time_step, int max_sub_steps);
 	void update(float time_step, int max_sub_steps, float fixed_time_step);
@@ -33,13 +34,18 @@ public:
 
 	void addRigidBody(RigidBody *rbody);
 
-	void addCollisionObject(CollisionObject *object);
-
 	void addCharacterController(CharacterController *object);
+
+	void removeRigidBody(CollisionObject *object);
+
+	void removeCharacterController(CharacterController *object);
 
 	btDispatcher *getDispatcher();
 
-	love::Object *findObject(void *rbody) const;
+	love::Object *findObject(void *bt_collision_object) const;
+
+	void attachObject(void *bt_collision_object, love::Object *object);
+	void detachObject(void *bt_collision_object);
 
 private:
 	btBroadphaseInterface* m_broadphase;
@@ -48,9 +54,9 @@ private:
 	btDefaultCollisionConfiguration* m_collisionConfiguration;
 	btDiscreteDynamicsWorld* world;
 
-	btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
-
 	std::unordered_map<void*, love::Object*> object_list;
+
+	std::unordered_map<void*, love::Object*> action_list;
 };
 
 } // bt

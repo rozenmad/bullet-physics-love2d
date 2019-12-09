@@ -164,6 +164,12 @@ int w_CollisionObject_hasAnisotropicFriction(lua_State *L) {
 	return 1;
 }
 
+int w_CollisionObject_getCollisionShape(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	luax_pushtype(L, object->getCollisionShape());
+	return 1;
+}
+
 int w_CollisionObject_getContactProcessingThreshold(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_pushnumber(L, object->getContactProcessingThreshold());
@@ -258,6 +264,7 @@ static const luaL_Reg w_CollisionObject_functions[] =
 	{ "setCcdMotionThreshold", w_CollisionObject_setCcdMotionThreshold },
 	{ "getAnisotropicFriction", w_CollisionObject_getAnisotropicFriction },
 	{ "hasAnisotropicFriction", w_CollisionObject_hasAnisotropicFriction },
+	{ "getCollisionShape", w_CollisionObject_getCollisionShape },
 	{ "getContactProcessingThreshold", w_CollisionObject_getContactProcessingThreshold },
 	{ "getRestitution", w_CollisionObject_getRestitution },
 	{ "getFriction", w_CollisionObject_getFriction },

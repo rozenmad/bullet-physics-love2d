@@ -14,6 +14,7 @@ MotionState::MotionState(RigidBody *rbody, lua_State *L) :
 	reference(new Reference(L)),
 	L(L)
 {
+
 }
 
 void MotionState::getWorldTransform(btTransform& t) const {
@@ -59,12 +60,12 @@ btRigidBody *RigidBody::create_bt_rigid_body(Shape *shape, float mass, lua_State
 RigidBody::RigidBody(Shape *shape, float mass, lua_State *L) :
 	CollisionObject(create_bt_rigid_body(shape, mass, L), shape)
 {
-
 }
 
 RigidBody::~RigidBody()
 {
-	
+	delete rbody;
+	delete motion_state;
 }
 
 void RigidBody::setDamping(btScalar linear, btScalar angular) {
