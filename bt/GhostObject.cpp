@@ -21,6 +21,11 @@ btPairCachingGhostObject *GhostObject::create_bt_pair_caching_ghost_object() {
 	return pair_caching_ghost_object;
 }
 
+GhostObject::~GhostObject() {
+	delete pair_caching_ghost_object;
+}
+
+
 } // bt
 } // physics3d
 } // love

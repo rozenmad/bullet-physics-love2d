@@ -15,6 +15,10 @@ CapsuleShape::CapsuleShape(btScalar radius, btScalar height) :
 
 }
 
+CapsuleShape::~CapsuleShape() {
+
+}
+
 } // bt
 } // physics3d
 } // love

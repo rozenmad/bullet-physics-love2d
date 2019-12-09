@@ -60,10 +60,10 @@ btRigidBody *RigidBody::create_bt_rigid_body(Shape *shape, float mass, lua_State
 RigidBody::RigidBody(Shape *shape, float mass, lua_State *L) :
 	CollisionObject(create_bt_rigid_body(shape, mass, L), shape)
 {
+	
 }
 
-RigidBody::~RigidBody()
-{
+RigidBody::~RigidBody() {
 	delete rbody;
 	delete motion_state;
 }

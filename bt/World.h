@@ -4,7 +4,8 @@
 #include "common/Object.h"
 #include "common/runtime.h"
 #include "btBulletDynamicsCommon.h"
-
+#include "BulletDynamics/Character/btKinematicCharacterController.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "RaycastHit.h"
 
 #include <unordered_map>
@@ -42,21 +43,16 @@ public:
 
 	btDispatcher *getDispatcher();
 
-	love::Object *findObject(void *bt_collision_object) const;
-
-	void attachObject(void *bt_collision_object, love::Object *object);
-	void detachObject(void *bt_collision_object);
-
 private:
 	btBroadphaseInterface* m_broadphase;
 	btCollisionDispatcher* m_dispatcher;
 	btConstraintSolver* m_solver;
 	btDefaultCollisionConfiguration* m_collisionConfiguration;
 	btDiscreteDynamicsWorld* world;
+	btGhostPairCallback *ghost_pair_callback;
 
-	std::unordered_map<void*, love::Object*> object_list;
-
-	std::unordered_map<void*, love::Object*> action_list;
+	std::unordered_map<void*, CollisionObject*> object_list;
+	std::unordered_map<void*, CharacterController*> action_list;
 };
 
 } // bt

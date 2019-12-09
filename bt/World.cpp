@@ -24,16 +24,22 @@ World::World(float gx, float gy, float gz)
 	world = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
 	world->setGravity(btVector3(gx, gy, gz));
 
-	world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+	ghost_pair_callback = new btGhostPairCallback();
+	world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(ghost_pair_callback);
     world->setSynchronizeAllMotionStates(true);
 }
 
 World::~World() {
 	for( auto &it: object_list ) {
-		it.second->release();
+		removeRigidBody(it.second);
+	}
+	for( auto &it: action_list ) {
+		removeCharacterController(it.second);
 	}
 	object_list.clear();
+	action_list.clear();
 
+	delete ghost_pair_callback;
 	delete world;
 	delete m_solver;
 	delete m_broadphase;
@@ -100,9 +106,9 @@ int World::raycast(lua_State *L, const btVector3 &origin, const btVector3 &direc
 }
 
 void World::addRigidBody(RigidBody *object) {
+	object_list[object->collision_object] = object;
 	object->world = this;
 	world->addRigidBody(object->rbody);
-	attachObject(object->collision_object, object);
 	object->retain();
 }
 
@@ -110,45 +116,29 @@ void World::addCharacterController(CharacterController *object) {
 	GhostObject *ghost = object->getGhostObject();
 	ghost->world = this;
 	world->addCollisionObject(ghost->collision_object, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
-	attachObject(ghost->collision_object, ghost);
-	ghost->retain();
 
+	action_list[object->kinematic_character_controller] = object;
     world->addAction(object->kinematic_character_controller);
-    attachObject(object->kinematic_character_controller, object);
     object->retain();
 }
 
 void World::removeRigidBody(CollisionObject *object) {
+	object_list.erase(object->collision_object);
 	world->removeCollisionObject(object->collision_object);
-	detachObject(object->collision_object);
 	object->release();
 }
 
 void World::removeCharacterController(CharacterController *object) {
+	GhostObject *ghost = object->getGhostObject();
+	world->removeCollisionObject(ghost->collision_object);
+
+	action_list.erase(object->kinematic_character_controller);
 	world->removeAction(object->kinematic_character_controller);
-	detachObject(object->kinematic_character_controller);
 	object->release();
 }
 
 btDispatcher *World::getDispatcher() {
 	return world->getDispatcher();
-}
-
-love::Object *World::findObject(void *rbody) const
-{
-	auto it = object_list.find(rbody);
-	if (it != object_list.end())
-		return it->second;
-	else
-		return nullptr;
-}
-
-void World::attachObject(void *bt_collision_object, love::Object *object) {
-	object_list[bt_collision_object] = object;
-}
-
-void World::detachObject(void *bt_collision_object) {
-	object_list.erase(bt_collision_object);
 }
 
 } // bt

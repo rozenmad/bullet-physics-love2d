@@ -7,8 +7,7 @@ namespace physics3d
 namespace bt
 {
 
-ContactPoint *luax_checkcontactpoint(lua_State *L, int idx)
-{
+ContactPoint *luax_checkcontactpoint(lua_State *L, int idx) {
 	return luax_checktype<ContactPoint>(L, idx);
 }
 
@@ -45,8 +44,7 @@ static const luaL_Reg w_ContactPoint_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_contactpoint(lua_State *L)
-{
+extern "C" int luaopen_bt_contactpoint(lua_State *L) {
 	return luax_register_type(L, &ContactPoint::type, w_ContactPoint_functions, nullptr);
 }
 

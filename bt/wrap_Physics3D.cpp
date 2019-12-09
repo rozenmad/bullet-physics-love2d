@@ -133,8 +133,7 @@ static const lua_CFunction types[] =
 	0
 };
 
-extern "C" int luaopen_love_physics3d(lua_State *L)
-{
+extern "C" int luaopen_love_physics3d(lua_State *L) {
 	Physics3D *instance = instance();
 	if (instance == nullptr)
 	{

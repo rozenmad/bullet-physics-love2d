@@ -12,6 +12,10 @@ love::Type TriangleMeshShape::type("btTriangleMeshShape", &Shape::type);
 TriangleMeshShape::TriangleMeshShape(lua_State *L) :
 	Shape(generate_bvh_trangle_mesh_shape(L))
 {
+	
+}
+
+TriangleMeshShape::~TriangleMeshShape() {
 
 }
 

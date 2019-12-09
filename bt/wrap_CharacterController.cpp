@@ -8,8 +8,7 @@ namespace physics3d
 namespace bt
 {
 
-CharacterController *luax_checkcharactercontroller(lua_State *L, int idx)
-{
+CharacterController *luax_checkcharactercontroller(lua_State *L, int idx) {
 	return luax_checktype<CharacterController>(L, idx);
 }
 
@@ -80,8 +79,7 @@ static const luaL_Reg w_CharacterController_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_charactercontroller(lua_State *L)
-{
+extern "C" int luaopen_bt_charactercontroller(lua_State *L) {
 	return luax_register_type(L, &CharacterController::type, w_CharacterController_functions, nullptr);
 }
 

@@ -16,6 +16,7 @@ public:
 	static love::Type type;
 
 	BoxShape(const btVector3 &box_half_extents);
+	virtual ~BoxShape();
 private:
 };
 

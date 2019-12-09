@@ -14,7 +14,7 @@ love::Type CollisionObject::type("btCollisionObject", &Object::type);
 int CollisionObject::ContactCallback::report(World *world, 
 	btPersistentManifold *manifold, 
 	CollisionObject *a, 
-	CollisionObject *b)
+	CollisionObject *b) 
 {
 	if( reference != nullptr && L != nullptr )
 	{

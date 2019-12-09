@@ -17,6 +17,7 @@ public:
 	static love::Type type;
 
 	TriangleMeshShape(lua_State *L);
+	virtual ~TriangleMeshShape();
 
 private:
 	btBvhTriangleMeshShape *generate_bvh_trangle_mesh_shape(lua_State *L);

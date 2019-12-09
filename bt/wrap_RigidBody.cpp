@@ -9,13 +9,11 @@ namespace physics3d
 namespace bt
 {
 
-RigidBody *luax_checkrigidbody(lua_State *L, int idx)
-{
+RigidBody *luax_checkrigidbody(lua_State *L, int idx) {
 	return luax_checktype<RigidBody>(L, idx);
 }
 
-int w_RigidBody_setDamping(lua_State *L)
-{
+int w_RigidBody_setDamping(lua_State *L) {
 	RigidBody *rbody = luax_checkrigidbody(L, 1);
 
 	float lin = (float)luaL_checknumber(L, 2);
@@ -99,8 +97,7 @@ static const luaL_Reg w_RigidBody_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_rigidbody(lua_State *L)
-{
+extern "C" int luaopen_bt_rigidbody(lua_State *L) {
 	return luax_register_type(L, &RigidBody::type, w_CollisionObject_functions, w_RigidBody_functions, nullptr);
 }
 

@@ -7,8 +7,7 @@ namespace physics3d
 namespace bt
 {
 
-Shape *luax_checkshape(lua_State *L, int idx)
-{
+Shape *luax_checkshape(lua_State *L, int idx) {
 	return luax_checktype<Shape>(L, idx);
 }
 
@@ -25,8 +24,7 @@ static const luaL_Reg w_Shape_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_shape(lua_State *L)
-{
+extern "C" int luaopen_bt_shape(lua_State *L) {
 	return luax_register_type(L, &Shape::type, w_Shape_functions, nullptr);
 }
 

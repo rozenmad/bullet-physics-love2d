@@ -15,6 +15,10 @@ BoxShape::BoxShape(const btVector3 &box_half_extents) :
 
 }
 
+BoxShape::~BoxShape() {
+
+}
+
 } // bt
 } // physics3d
 } // love

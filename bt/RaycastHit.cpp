@@ -18,7 +18,6 @@ RaycastHit::RaycastHit(btCollisionWorld::AllHitsRayResultCallback &ray_callback,
 }
 
 RaycastHit::~RaycastHit() {
-
 }
 
 } // bt

@@ -8,13 +8,11 @@ namespace physics3d
 namespace bt
 {
 
-CollisionObject *luax_checkcollisionobject(lua_State *L, int idx)
-{
+CollisionObject *luax_checkcollisionobject(lua_State *L, int idx) {
 	return luax_checktype<CollisionObject>(L, idx);
 }
 
-int w_CollisionObject_getTransform(lua_State *L)
-{
+int w_CollisionObject_getTransform(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	btScalar a16[16];
 	object->getTransform(a16);
@@ -28,8 +26,7 @@ int w_CollisionObject_getTransform(lua_State *L)
 	return 0;
 }
 
-int w_CollisionObject_setTransform(lua_State *L)
-{
+int w_CollisionObject_setTransform(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	btScalar a16[16];
 	int idx = 2;
@@ -45,15 +42,13 @@ int w_CollisionObject_setTransform(lua_State *L)
 }
 
 
-int w_CollisionObject_setUserData(lua_State *L)
-{
+int w_CollisionObject_setUserData(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_remove(L, 1);
 	return object->setUserData(L);
 }
 
-int w_CollisionObject_getUserData(lua_State *L)
-{
+int w_CollisionObject_getUserData(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_remove(L, 1);
 	return object->getUserData(L);
@@ -280,8 +275,7 @@ static const luaL_Reg w_CollisionObject_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_collisionobject(lua_State *L)
-{
+extern "C" int luaopen_bt_collisionobject(lua_State *L) {
 	return luax_register_type(L, &CollisionObject::type, w_CollisionObject_functions, nullptr);
 }
 

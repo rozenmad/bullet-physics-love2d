@@ -16,6 +16,7 @@ public:
 	static love::Type type;
 
 	ContactPoint(const btManifoldPoint &point);
+	virtual ~ContactPoint() {}
 
 	btScalar getDistance() const;
 	btScalar getAppliedImpulse() const;

@@ -8,8 +8,7 @@ namespace physics3d
 namespace bt
 {
 
-BoxShape *luax_checkboxshape(lua_State *L, int idx)
-{
+BoxShape *luax_checkboxshape(lua_State *L, int idx) {
 	return luax_checktype<BoxShape>(L, idx);
 }
 
@@ -23,8 +22,7 @@ static const luaL_Reg w_BoxShape_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_boxshape(lua_State *L)
-{
+extern "C" int luaopen_bt_boxshape(lua_State *L) {
 	return luax_register_type(L, &BoxShape::type, w_Shape_functions, w_BoxShape_functions, nullptr);
 }
 

@@ -10,8 +10,7 @@ namespace physics3d
 namespace bt
 {
 
-const char *Physics3D::getName() const
-{
+const char *Physics3D::getName() const {
 	return "love.physics3d.bt";
 }
 

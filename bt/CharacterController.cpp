@@ -21,9 +21,8 @@ CharacterController::CharacterController(GhostObject *ghost_object, btScalar ste
 	kinematic_character_controller = new btKinematicCharacterController(ghost_object->getObject(), (btConvexShape*)bt_shape, step_height, up);
 }
 
-CharacterController::~CharacterController()
-{
-    
+CharacterController::~CharacterController() {
+    delete kinematic_character_controller;
 }
 
 void CharacterController::jump(const btVector3 &v) {

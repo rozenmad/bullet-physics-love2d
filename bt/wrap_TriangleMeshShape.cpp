@@ -7,8 +7,7 @@ namespace physics3d
 namespace bt
 {
 
-TriangleMeshShape *luax_checktrianglemeshshape(lua_State *L, int idx)
-{
+TriangleMeshShape *luax_checktrianglemeshshape(lua_State *L, int idx) {
 	return luax_checktype<TriangleMeshShape>(L, idx);;
 }
 
@@ -22,8 +21,7 @@ static const luaL_Reg w_TriangleMeshShape_functions[] =
 	{ 0, 0 }
 };
 
-extern "C" int luaopen_bt_trianglemeshshape(lua_State *L)
-{
+extern "C" int luaopen_bt_trianglemeshshape(lua_State *L) {
 	return luax_register_type(L, &TriangleMeshShape::type, w_Shape_functions, w_TriangleMeshShape_functions, nullptr);
 }
 

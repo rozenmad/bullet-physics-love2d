@@ -9,8 +9,10 @@ local world = love.physics3d.newWorld(gx, gy, gz)
 world:update()
 world:raycast()
 world:addRigidBody()
-world:addCollisionObject()
 world:addCharacterController()
+
+world:removeRigidBody()
+world:removeCharacterController()
 ```
 
 ##### CollisionObject (Base class for RigidBody and GhostObject)

@@ -12,11 +12,10 @@ love::Type Shape::type("btShape", &Object::type);
 Shape::Shape(btCollisionShape *shape) :
 	shape(shape) 
 {
-	
+
 }
 
-Shape::~Shape() 
-{
+Shape::~Shape() {
 	delete shape;
 }
 

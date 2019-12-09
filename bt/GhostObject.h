@@ -18,6 +18,7 @@ public:
 	static love::Type type;
 
 	GhostObject(Shape *shape);
+	virtual ~GhostObject();
 
 	btPairCachingGhostObject *getObject() {
 		return pair_caching_ghost_object;

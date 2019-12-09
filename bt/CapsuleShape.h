@@ -16,6 +16,8 @@ public:
 	static love::Type type;
 
 	CapsuleShape(btScalar radius, btScalar height);
+	virtual ~CapsuleShape();
+	
 private:
 };
 
