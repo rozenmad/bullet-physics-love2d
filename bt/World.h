@@ -9,6 +9,7 @@
 #include "RaycastHit.h"
 
 #include <unordered_map>
+#include <utility>
 
 namespace love
 {
@@ -20,6 +21,7 @@ namespace bt
 class RigidBody;
 class CollisionObject;
 class CharacterController;
+class ContactPair;
 
 class World : public Object {
 public:
@@ -44,6 +46,9 @@ public:
 	btDispatcher *getDispatcher();
 
 private:
+	void updateContactList();
+
+private:
 	btBroadphaseInterface* m_broadphase;
 	btCollisionDispatcher* m_dispatcher;
 	btConstraintSolver* m_solver;
@@ -53,6 +58,10 @@ private:
 
 	std::unordered_map<void*, CollisionObject*> object_list;
 	std::unordered_map<void*, CharacterController*> action_list;
+
+	std::unordered_map<size_t, ContactPair> contact_pair_list;
+
+	int timestamp_sync;
 };
 
 } // bt

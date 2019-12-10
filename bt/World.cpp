@@ -2,6 +2,7 @@
 #include "RigidBody.h"
 #include "CollisionObject.h"
 #include "CharacterController.h"
+#include "ContactPair.h"
 
 namespace love
 {
@@ -12,7 +13,8 @@ namespace bt
 
 love::Type World::type("btWorld", &Object::type);
 
-World::World(float gx, float gy, float gz) 
+World::World(float gx, float gy, float gz) :
+	timestamp_sync(0)
 {
 	m_collisionConfiguration = new btDefaultCollisionConfiguration();
 
@@ -30,6 +32,11 @@ World::World(float gx, float gy, float gz)
 }
 
 World::~World() {
+	/*for( auto it = contact_pair_list.begin(); it != contact_pair_list.end(); ) {
+		it->second.releaseContactPoints();
+	}
+	contact_pair_list.clear();*/
+
 	for( auto &it: object_list ) {
 		removeRigidBody(it.second);
 	}
@@ -40,50 +47,74 @@ World::~World() {
 	action_list.clear();
 
 	delete ghost_pair_callback;
+	ghost_pair_callback = nullptr;
 	delete world;
+	world = nullptr;
 	delete m_solver;
+	m_solver = nullptr;
 	delete m_broadphase;
+	m_broadphase = nullptr;
 	delete m_dispatcher;
+	m_dispatcher = nullptr;
 	delete m_collisionConfiguration;
+	m_collisionConfiguration = nullptr;
 }
 
 void World::update(float time_step, int max_sub_steps) {
 	if( world ) {
 		world->stepSimulation(time_step, max_sub_steps);
-	}
-
-	int manifolds_count = m_dispatcher->getNumManifolds();
-
-	for( int i = 0; i < manifolds_count; i++ ) {
-		btPersistentManifold* contactManifold = m_dispatcher->getManifoldByIndexInternal(i);
-
-		const btCollisionObject* obA = contactManifold->getBody0();
-		const btCollisionObject* obB = contactManifold->getBody1();
-
-		int contacts = contactManifold->getNumContacts();
-		if( contacts > 0 ) {
-			CollisionObject *objA = ((UserData*)obA->getUserPointer())->obj;
-			CollisionObject *objB = ((UserData*)obB->getUserPointer())->obj;
-
-			objA->contact_callback.report(this, contactManifold, objA, objB);
-			objB->contact_callback.report(this, contactManifold, objB, objA);
-
-			/*for( int j = 0; j < contacts; j++ ) {
-				btManifoldPoint& pt = contactManifold->getContactPoint(j);
-				if( pt.getDistance() < 0.f ) {
-					const btVector3& ptA = pt.getPositionWorldOnA();
-					const btVector3& ptB = pt.getPositionWorldOnB();
-
-					const btVector3& normalOnB = pt.m_normalWorldOnB;
-				}
-			}*/
-		}
+		updateContactList();
 	}
 }
 
 void World::update(float time_step, int max_sub_steps, float fixed_time_step) {
 	if( world ) {
 		world->stepSimulation(time_step, max_sub_steps, fixed_time_step);
+		updateContactList();
+	}
+}
+
+void World::updateContactList() {
+	int manifolds_count = m_dispatcher->getNumManifolds();
+
+	timestamp_sync++;
+	for( int i = 0; i < manifolds_count; i++ ) {
+		btPersistentManifold* contact_manifold = m_dispatcher->getManifoldByIndexInternal(i);
+
+		if( contact_manifold->getNumContacts() <= 0 ) {
+			continue;
+		} 
+
+		ContactPair pair(contact_manifold, timestamp_sync);
+		pair.updateContactPoints();
+
+		size_t pair_hash = pair.hash();
+
+		if( contact_pair_list.find(pair_hash) == contact_pair_list.end() ) {
+			// begin
+			pair.bodyA->contact_beg.report(this, pair);
+			pair.bodyB->contact_beg.report(this, pair);
+		}
+
+		{ 	// ongoing
+			pair.bodyA->contact_ong.report(this, pair);
+			pair.bodyB->contact_ong.report(this, pair);
+		}
+
+		contact_pair_list[pair_hash] = pair;
+	}
+
+	for( auto it = contact_pair_list.begin(); it != contact_pair_list.end(); ) {
+		ContactPair &pair = it->second;
+	   	if( pair.timestamp < timestamp_sync ) {
+	   		pair.bodyA->contact_end.report(this, pair);
+			pair.bodyB->contact_end.report(this, pair);
+
+			pair.releaseContactPoints();
+			it = contact_pair_list.erase(it);
+			continue;
+	   	}
+	   	it++;
 	}
 }
 

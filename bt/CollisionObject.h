@@ -16,11 +16,13 @@ namespace bt
 {
 
 class CollisionObject;
+class ContactPair;
 
 struct UserData
 {
 	CollisionObject *obj = nullptr;
 	Reference *reference = nullptr;
+	int timestamp = 0;
 };
 
 class CollisionObject : public Object {
@@ -32,7 +34,8 @@ public:
 	struct ContactCallback {
 		Reference *reference = nullptr;
 		lua_State *L = nullptr;
-		int report(World *world, btPersistentManifold *manifold, CollisionObject *a, CollisionObject *b);
+
+		int report(World *world, ContactPair &pair);
 	};
 
 	CollisionObject(btCollisionObject *collision_object, Shape *shape);
@@ -44,7 +47,7 @@ public:
 	int setUserData(lua_State *L);
 	int getUserData(lua_State *L);
 
-	int setCallback(lua_State *L);
+	int setCallbacks(lua_State *L);
 
 	bool isStatic() const;
 	bool isKinematic() const;
@@ -96,8 +99,7 @@ protected:
 	World *world;
 
 	UserData *userdata;
-
-	ContactCallback contact_callback;
+	ContactCallback contact_beg, contact_ong, contact_end;
 
 	StrongRef<Shape> shape_reference;
 };

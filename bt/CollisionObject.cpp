@@ -1,6 +1,7 @@
 #include "CollisionObject.h"
 #include "ContactPoint.h"
 #include "World.h"
+#include "ContactPair.h"
 
 namespace love
 {
@@ -11,26 +12,21 @@ namespace bt
 
 love::Type CollisionObject::type("btCollisionObject", &Object::type);
 
-int CollisionObject::ContactCallback::report(World *world, 
-	btPersistentManifold *manifold, 
-	CollisionObject *a, 
-	CollisionObject *b) 
+int CollisionObject::ContactCallback::report(World *world, ContactPair &pair) 
 {
-	if( reference != nullptr && L != nullptr )
-	{
+	if( reference != nullptr && L != nullptr ) {
 		reference->push(L);
-		int contacts = manifold->getNumContacts();
+		int contacts = pair.getContactPointsCount();
 		lua_createtable(L, contacts, 0);
+
 		int table_index = lua_gettop(L);
 		for( int i = 0; i < contacts; i++ ) {
-			ContactPoint *point;
-			luax_catchexcept(L, [&](){ point = new ContactPoint(manifold->getContactPoint(i)); });
-			luax_pushtype(L, point);
-			point->release();
+			luax_pushtype(L, pair.getContactPoint(i));
 			lua_rawseti(L, table_index, i + 1);
 		}
-		luax_pushtype(L, a);
-		luax_pushtype(L, b);
+		luax_pushtype(L, pair.getBodyA());
+		luax_pushtype(L, pair.getBodyB());
+
 		lua_call(L, 3, 0);
 	}
 	return 0;
@@ -44,7 +40,6 @@ CollisionObject::CollisionObject(btCollisionObject *collision_object, Shape *sha
 	userdata->obj = this;
 	collision_object->setUserPointer((void*)userdata);
 
-	contact_callback.reference = new Reference();
 	shape_reference.set(shape);
 }
 
@@ -54,6 +49,18 @@ CollisionObject::~CollisionObject() {
 			delete userdata->reference;
 		}
 		delete userdata;
+	}
+	if( contact_beg.reference ) {
+		delete contact_beg.reference;
+		contact_beg.reference = nullptr;
+	}
+	if( contact_ong.reference ) {
+		delete contact_ong.reference;
+		contact_ong.reference = nullptr;
+	}
+	if( contact_end.reference ) {
+		delete contact_end.reference;
+		contact_end.reference = nullptr;
 	}
 }
 
@@ -90,15 +97,37 @@ int CollisionObject::getUserData(lua_State *L) {
 	return 1;
 }
 
-int CollisionObject::setCallback(lua_State *L) {
-	if( contact_callback.reference ) {
-		contact_callback.reference->unref();
+int CollisionObject::setCallbacks(lua_State *L) {
+	int nargs = lua_gettop(L);
+
+	if( contact_beg.reference ) {
+		delete contact_beg.reference;
+		contact_beg.reference = nullptr;
+	}
+	if( contact_ong.reference ) {
+		delete contact_ong.reference;
+		contact_ong.reference = nullptr;
+	}
+	if( contact_end.reference ) {
+		delete contact_end.reference;
+		contact_end.reference = nullptr;
 	}
 
-	luaL_checktype(L, 1, LUA_TFUNCTION);
-	lua_pushvalue(L, 1);
-	contact_callback.reference = luax_refif(L, LUA_TFUNCTION);
-	contact_callback.L = L;
+	if( nargs >= 1 && !lua_isnoneornil(L, 1) ) {
+		lua_pushvalue(L, 1);
+		contact_beg.reference = luax_refif(L, LUA_TFUNCTION);
+		contact_beg.L = L;
+	}
+	if( nargs >= 2 && !lua_isnoneornil(L, 1) ) {
+		lua_pushvalue(L, 2);
+		contact_ong.reference = luax_refif(L, LUA_TFUNCTION);
+		contact_ong.L = L;
+	}
+	if( nargs >= 3 && !lua_isnoneornil(L, 1) ) {
+		lua_pushvalue(L, 3);
+		contact_end.reference = luax_refif(L, LUA_TFUNCTION);
+		contact_end.L = L;
+	}
 	return 0;
 }
 

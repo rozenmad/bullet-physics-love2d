@@ -54,10 +54,10 @@ int w_CollisionObject_getUserData(lua_State *L) {
 	return object->getUserData(L);
 }
 
-int w_CollisionObject_setCallback(lua_State *L) {
+int w_CollisionObject_setCallbacks(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_remove(L, 1);
-	return object->setCallback(L);
+	return object->setCallbacks(L);
 }
 
 int w_CollisionObject_activate(lua_State *L) {
@@ -244,7 +244,7 @@ static const luaL_Reg w_CollisionObject_functions[] =
 	{ "setTransform", w_CollisionObject_setTransform },
 	{ "setUserData", w_CollisionObject_setUserData },
 	{ "getUserData", w_CollisionObject_getUserData },
-	{ "setCallback", w_CollisionObject_setCallback },
+	{ "setCallbacks", w_CollisionObject_setCallbacks },
 	{ "activate", w_CollisionObject_activate },
 	{ "isActive", w_CollisionObject_isActive },
 	{ "setAnisotropicFriction", w_CollisionObject_setAnisotropicFriction },
