@@ -23,7 +23,8 @@ collision_object:getTransform(table)
 collision_object:setTransform(table)
 collision_object:setUserData(table)
 collision_object:getUserData(table)
-collision_object:setCallbacks(begin_contact, ongoing_contact, end_contact) -- function(tableofContactPoint, bodyA, bodyB) end
+-- parameters for callbacks: function(tableofContactPoint, bodyA, bodyB) end
+collision_object:setCallbacks(begin_contact, ongoing_contact, end_contact) 
 collision_object:activate(force)
 collision_object:isActive()
 collision_object:setAnisotropicFriction(vec3Factor)
