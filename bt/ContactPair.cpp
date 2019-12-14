@@ -40,8 +40,9 @@ void ContactPair::updateContactPoints() {
 }
 
 void ContactPair::releaseContactPoints() {
-	for( auto &point : contact_points ) {
-		point->release();
+	for( auto it = contact_points.begin(); it != contact_points.end(); it++ ) {
+		ContactPoint *point = *it;
+	   	point->release();
 	}
 	contact_points.clear();
 }

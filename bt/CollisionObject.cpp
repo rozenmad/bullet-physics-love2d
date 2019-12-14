@@ -49,12 +49,6 @@ CollisionObject::CollisionObject(btCollisionObject *collision_object, Shape *sha
 }
 
 CollisionObject::~CollisionObject() {
-	if( userdata ) {
-		if( userdata->reference ) {
-			delete userdata->reference;
-		}
-		delete userdata;
-	}
 	if( contact_beg.reference ) {
 		delete contact_beg.reference;
 		contact_beg.reference = nullptr;
@@ -66,6 +60,12 @@ CollisionObject::~CollisionObject() {
 	if( contact_end.reference ) {
 		delete contact_end.reference;
 		contact_end.reference = nullptr;
+	}
+	if( userdata ) {
+		if( userdata->reference ) {
+			delete userdata->reference;
+		}
+		delete userdata;
 	}
 }
 

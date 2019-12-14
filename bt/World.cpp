@@ -32,10 +32,10 @@ World::World(float gx, float gy, float gz) :
 }
 
 World::~World() {
-	/*for( auto it = contact_pair_list.begin(); it != contact_pair_list.end(); ) {
+	for( auto it = contact_pair_list.begin(); it != contact_pair_list.end(); it++ ) {
 		it->second.releaseContactPoints();
 	}
-	contact_pair_list.clear();*/
+	contact_pair_list.clear();
 
 	for( auto &it: object_list ) {
 		removeRigidBody(it.second);
@@ -94,6 +94,8 @@ void World::updateContactList() {
 			// begin
 			pair.bodyA->contact_beg.report(this, pair);
 			pair.bodyB->contact_beg.report(this, pair, true);
+		} else {
+			pair.releaseContactPoints();
 		}
 
 		{ 	// ongoing
