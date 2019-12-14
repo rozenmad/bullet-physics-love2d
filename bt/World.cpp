@@ -28,7 +28,7 @@ World::World(float gx, float gy, float gz) :
 
 	ghost_pair_callback = new btGhostPairCallback();
 	world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(ghost_pair_callback);
-    world->setSynchronizeAllMotionStates(true);
+	world->setSynchronizeAllMotionStates(true);
 }
 
 World::~World() {
@@ -127,15 +127,23 @@ int World::raycast(lua_State *L, const btVector3 &origin, const btVector3 &direc
 
 	int size = ray_callback.m_collisionObjects.size();
 
+	std::vector<RaycastHit*> list;
+	for( int i = 0; i < size; i++ ) {
+	    list.push_back(new RaycastHit(ray_callback, i, origin));
+	}
+	std::sort(list.begin(), list.end(), [](const RaycastHit *a, const RaycastHit *b) {
+		return a->distance < b->distance;
+	});
+
 	lua_createtable(L, size, 0);
 	int table_index = lua_gettop(L);
 	for( int i = 0; i < size; i++ ) {
-        RaycastHit *hit = new RaycastHit(ray_callback, i, origin);
-        luax_pushtype(L, hit);
-        hit->release();
-        lua_rawseti(L, table_index, i + 1);
-    }
-    return 1;
+		RaycastHit *hit = list[i]; 
+	    luax_pushtype(L, hit);
+	    hit->release();
+	    lua_rawseti(L, table_index, i + 1);
+	}
+	return 1;
 }
 
 void World::addRigidBody(RigidBody *object) {
