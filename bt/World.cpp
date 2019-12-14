@@ -93,12 +93,12 @@ void World::updateContactList() {
 		if( contact_pair_list.find(pair_hash) == contact_pair_list.end() ) {
 			// begin
 			pair.bodyA->contact_beg.report(this, pair);
-			pair.bodyB->contact_beg.report(this, pair);
+			pair.bodyB->contact_beg.report(this, pair, true);
 		}
 
 		{ 	// ongoing
 			pair.bodyA->contact_ong.report(this, pair);
-			pair.bodyB->contact_ong.report(this, pair);
+			pair.bodyB->contact_ong.report(this, pair, true);
 		}
 
 		contact_pair_list[pair_hash] = pair;
@@ -108,7 +108,7 @@ void World::updateContactList() {
 		ContactPair &pair = it->second;
 	   	if( pair.timestamp < timestamp_sync ) {
 	   		pair.bodyA->contact_end.report(this, pair);
-			pair.bodyB->contact_end.report(this, pair);
+			pair.bodyB->contact_end.report(this, pair, true);
 
 			pair.releaseContactPoints();
 			it = contact_pair_list.erase(it);

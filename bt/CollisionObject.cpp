@@ -12,7 +12,7 @@ namespace bt
 
 love::Type CollisionObject::type("btCollisionObject", &Object::type);
 
-int CollisionObject::ContactCallback::report(World *world, ContactPair &pair) 
+int CollisionObject::ContactCallback::report(World *world, ContactPair &pair, bool swapbody) 
 {
 	if( reference != nullptr && L != nullptr ) {
 		reference->push(L);
@@ -24,8 +24,13 @@ int CollisionObject::ContactCallback::report(World *world, ContactPair &pair)
 			luax_pushtype(L, pair.getContactPoint(i));
 			lua_rawseti(L, table_index, i + 1);
 		}
-		luax_pushtype(L, pair.getBodyA());
-		luax_pushtype(L, pair.getBodyB());
+		if( swapbody ) {
+			luax_pushtype(L, pair.getBodyB());
+			luax_pushtype(L, pair.getBodyA());
+		} else {
+			luax_pushtype(L, pair.getBodyA());
+			luax_pushtype(L, pair.getBodyB());
+		}
 
 		lua_call(L, 3, 0);
 	}

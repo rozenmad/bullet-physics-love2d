@@ -35,7 +35,7 @@ public:
 		Reference *reference = nullptr;
 		lua_State *L = nullptr;
 
-		int report(World *world, ContactPair &pair);
+		int report(World *world, ContactPair &pair, bool swapbody = false);
 	};
 
 	CollisionObject(btCollisionObject *collision_object, Shape *shape);
