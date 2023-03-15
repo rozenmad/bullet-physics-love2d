@@ -12,7 +12,7 @@ namespace bt
 
 love::Type CollisionObject::type("btCollisionObject", &Object::type);
 
-int CollisionObject::ContactCallback::report(World *world, ContactPair &pair, bool swapbody) 
+int CollisionObject::ContactCallback::report(World *world, ContactPair &pair) 
 {
 	if( reference != nullptr && L != nullptr ) {
 		reference->push(L);
@@ -24,13 +24,8 @@ int CollisionObject::ContactCallback::report(World *world, ContactPair &pair, bo
 			luax_pushtype(L, pair.getContactPoint(i));
 			lua_rawseti(L, table_index, i + 1);
 		}
-		if( swapbody ) {
-			luax_pushtype(L, pair.getBodyB());
-			luax_pushtype(L, pair.getBodyA());
-		} else {
-			luax_pushtype(L, pair.getBodyA());
-			luax_pushtype(L, pair.getBodyB());
-		}
+		luax_pushtype(L, pair.getBodyA());
+		luax_pushtype(L, pair.getBodyB());
 
 		lua_call(L, 3, 0);
 	}
@@ -49,36 +44,85 @@ CollisionObject::CollisionObject(btCollisionObject *collision_object, Shape *sha
 }
 
 CollisionObject::~CollisionObject() {
-	if( contact_beg.reference ) {
-		delete contact_beg.reference;
-		contact_beg.reference = nullptr;
-	}
-	if( contact_ong.reference ) {
-		delete contact_ong.reference;
-		contact_ong.reference = nullptr;
-	}
-	if( contact_end.reference ) {
-		delete contact_end.reference;
-		contact_end.reference = nullptr;
-	}
 	if( userdata ) {
 		if( userdata->reference ) {
 			delete userdata->reference;
 		}
 		delete userdata;
 	}
+	for( int i = 0; i < 3; i++ ) {
+		if( contacts[i].reference ) {
+			delete contacts[i].reference;
+			contacts[i].reference = nullptr;
+		}
+	}
+}
+
+void CollisionObject::setAnisotropicFriction(const btVector3 &anisotropicFriction) {
+	collision_object->setAnisotropicFriction(anisotropicFriction);
+}
+
+const btVector3 &CollisionObject::getAnisotropicFriction() const {
+	return collision_object->getAnisotropicFriction();
+}
+
+bool CollisionObject::hasAnisotropicFriction() const {
+	return collision_object->hasAnisotropicFriction();
+}
+
+void CollisionObject::setContactProcessingThreshold(btScalar contactProcessingThreshold) {
+	collision_object->setContactProcessingThreshold(contactProcessingThreshold);
+}
+
+btScalar CollisionObject::getContactProcessingThreshold() const {
+	return collision_object->getContactProcessingThreshold();
+}
+
+bool CollisionObject::isStaticObject() const {
+	return collision_object->isStaticObject();
+}
+ 
+bool CollisionObject::isKinematicObject() const {
+	return collision_object->isKinematicObject();
+}
+ 
+bool CollisionObject::isStaticOrKinematicObject() const {
+	return collision_object->isStaticOrKinematicObject();
+}
+
+bool CollisionObject::hasContactResponse() const {
+	return collision_object->hasContactResponse();
+}
+
+void CollisionObject::setCollisionShape(Shape *collisionShape) {
+	shape_reference.set(collisionShape);
 }
 
 Shape *CollisionObject::getCollisionShape() {
 	return shape_reference.get();
 }
 
-void CollisionObject::getTransform(btScalar *a16) const {
+void CollisionObject::getTransform(lua_State *L, int idx) const {
+	btScalar a16[16];
 	auto &t = collision_object->getWorldTransform();
 	t.getOpenGLMatrix(a16);
+	if( lua_istable(L, idx) ) {
+		for( int i = 0; i < 16; i++ ) {
+			lua_pushnumber(L, a16[i]);
+			lua_rawseti(L, idx, i+1);
+		}
+	}
 }
 
-void CollisionObject::setTransform(btScalar *a16) {
+void CollisionObject::setTransform(lua_State *L, int idx) {
+	btScalar a16[16];
+	if( lua_istable(L, idx) ) {
+		for( int i = 0; i < 16; i++ ) {
+			lua_rawgeti(L, idx, i+1);
+			a16[i] = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
+		}
+	}
 	auto &t = collision_object->getWorldTransform();
 	t.setFromOpenGLMatrix(a16);
 }
@@ -102,58 +146,26 @@ int CollisionObject::getUserData(lua_State *L) {
 	return 1;
 }
 
-int CollisionObject::setCallbacks(lua_State *L) {
-	int nargs = lua_gettop(L);
+int CollisionObject::setCallback(lua_State *L) {
+	const char *callbackname = lua_tostring(L, 1);
+	lua_remove(L, 1);
+	CollisionObject::ContactNames name;
+	if (!CollisionObject::getContactConstant(callbackname, name))
+		return luax_enumerror(L, "contact name", CollisionObject::getContactConstants(name), callbackname);
 
-	if( contact_beg.reference ) {
-		delete contact_beg.reference;
-		contact_beg.reference = nullptr;
-	}
-	if( contact_ong.reference ) {
-		delete contact_ong.reference;
-		contact_ong.reference = nullptr;
-	}
-	if( contact_end.reference ) {
-		delete contact_end.reference;
-		contact_end.reference = nullptr;
+	ContactCallback &callback = contacts[name];
+
+	if( callback.reference ) {
+		delete callback.reference;
+		callback.reference = nullptr;
 	}
 
-	if( nargs >= 1 && !lua_isnoneornil(L, 1) ) {
+	if( !lua_isnoneornil(L, 1) ) {
 		lua_pushvalue(L, 1);
-		contact_beg.reference = luax_refif(L, LUA_TFUNCTION);
-		contact_beg.L = L;
-	}
-	if( nargs >= 2 && !lua_isnoneornil(L, 1) ) {
-		lua_pushvalue(L, 2);
-		contact_ong.reference = luax_refif(L, LUA_TFUNCTION);
-		contact_ong.L = L;
-	}
-	if( nargs >= 3 && !lua_isnoneornil(L, 1) ) {
-		lua_pushvalue(L, 3);
-		contact_end.reference = luax_refif(L, LUA_TFUNCTION);
-		contact_end.L = L;
+		callback.reference = luax_refif(L, LUA_TFUNCTION);
+		callback.L = L;
 	}
 	return 0;
-}
-
-bool CollisionObject::isStatic() const {
-	return collision_object->isStaticObject();
-}
- 
-bool CollisionObject::isKinematic() const {
-	return collision_object->isKinematicObject();
-}
- 
-bool CollisionObject::isStaticOrKinematic() const {
-	return collision_object->isStaticOrKinematicObject();
-}
-
-void CollisionObject::setAnisotropicFriction(const btVector3 &anisotropicFriction) {
-	collision_object->setAnisotropicFriction(anisotropicFriction);
-}
- 
-void CollisionObject::setContactProcessingThreshold(btScalar value) {
-	collision_object->setContactProcessingThreshold(value);
 }
 
 void CollisionObject::activate(bool force) const {
@@ -194,18 +206,6 @@ void CollisionObject::setCcdSweptSphereRadius(btScalar value) {
 
 void CollisionObject::setCcdMotionThreshold(btScalar value) {
 	collision_object->setCcdMotionThreshold(value);
-}
-
-const btVector3 &CollisionObject::getAnisotropicFriction() const {
-	return collision_object->getAnisotropicFriction();
-}
-
-bool CollisionObject::hasAnisotropicFriction() const {
-	return collision_object->hasAnisotropicFriction();
-}
-
-btScalar CollisionObject::getContactProcessingThreshold() const {
-	return collision_object->getContactProcessingThreshold();
 }
 
 btScalar CollisionObject::getRestitution() const {
@@ -251,6 +251,30 @@ btScalar CollisionObject::getCcdSquareMotionThreshold() const {
 bool CollisionObject::canCollideWith(CollisionObject const *other) const {
 	return collision_object->checkCollideWith(other->collision_object);
 }
+
+bool CollisionObject::getContactConstant(const char *in, ContactNames &out)
+{
+	return contactNames.find(in, out);
+}
+
+bool CollisionObject::getContactConstant(ContactNames in, const char *&out)
+{
+	return contactNames.find(in, out);
+}
+
+std::vector<std::string> CollisionObject::getContactConstants(ContactNames)
+{
+	return contactNames.getNames();
+}
+
+StringMap<CollisionObject::ContactNames, CollisionObject::CONTACT_MAX_ENUM>::Entry CollisionObject::contactNamesEntries[] =
+{
+	{ "start",   START_CONTACT   },
+	{ "ongoing", ONGOING_CONTACT },
+	{ "end",     END_CONTACT     },
+};
+
+StringMap<CollisionObject::ContactNames, CollisionObject::CONTACT_MAX_ENUM> CollisionObject::contactNames(CollisionObject::contactNamesEntries, sizeof(CollisionObject::contactNamesEntries));
 
 } // bt
 } // physics3d

@@ -1,8 +1,8 @@
-# bullet-physics-love2d-module
+# bullet-physics-love2d
 
-Module Bullet Physics for love2d engine, in development.
+Bullet Physics for LÖVE, in development.
 
-__Types and Functions:__
+__API:__
 ##### World
 ``` lua
 local world = love.physics3d.newWorld(gx, gy, gz)

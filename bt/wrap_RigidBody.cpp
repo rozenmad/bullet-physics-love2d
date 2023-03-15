@@ -13,6 +13,12 @@ RigidBody *luax_checkrigidbody(lua_State *L, int idx) {
 	return luax_checktype<RigidBody>(L, idx);
 }
 
+int w_RigidBody_applyGravity(lua_State *L) {
+	RigidBody *rbody = luax_checkrigidbody(L, 1);
+	rbody->applyGravity();
+	return 0;
+}
+
 int w_RigidBody_setDamping(lua_State *L) {
 	RigidBody *rbody = luax_checkrigidbody(L, 1);
 
@@ -29,6 +35,14 @@ int w_RigidBody_setRestitution(lua_State *L) {
 	return 0;
 }
 
+int w_RigidBody_applyCentralForce(lua_State *L) {
+	RigidBody *rbody = luax_checkrigidbody(L, 1);
+
+	btVector3 v = Physics3D::parse_btVector3(L, 2);
+	rbody->applyCentralForce(v);
+	return 0;
+}
+
 int w_RigidBody_applyForce(lua_State *L) {
 	RigidBody *rbody = luax_checkrigidbody(L, 1);
 
@@ -41,9 +55,9 @@ int w_RigidBody_applyForce(lua_State *L) {
 
 int w_RigidBody_setAngularFactor(lua_State *L) {
 	RigidBody *rbody = luax_checkrigidbody(L, 1);
-	btVector3 factor = Physics3D::parse_btVector3(L, 2);
+	btVector3 v = Physics3D::parse_btVector3(L, 2);
 
-	rbody->setAngularFactor(factor);
+	rbody->setAngularFactor(v);
 	return 0;
 }
 
@@ -67,6 +81,14 @@ int w_RigidBody_setKinematic(lua_State *L) {
 	return 0;
 }
 
+int w_RigidBody_translate(lua_State *L) {
+	RigidBody *rbody = luax_checkrigidbody(L, 1);
+	btVector3 v = Physics3D::parse_btVector3(L, 2);
+
+	rbody->translate(v);
+	return 0;
+}
+
 int w_RigidBody_getLinearVelocity(lua_State *L) {
 	RigidBody *rbody = luax_checkrigidbody(L, 1);
 	btVector3 const &v = rbody->getLinearVelocity();
@@ -87,11 +109,14 @@ int w_RigidBody_setLinearVelocity(lua_State *L) {
 
 static const luaL_Reg w_RigidBody_functions[] =
 {
+	{ "applyGravity", w_RigidBody_applyGravity },
 	{ "setDamping", w_RigidBody_setDamping },
+	{ "applyCentralForce", w_RigidBody_applyCentralForce },
 	{ "applyForce", w_RigidBody_applyForce },
 	{ "setAngularFactor", w_RigidBody_setAngularFactor },
 	{ "setLinearFactor", w_RigidBody_setLinearFactor },
 	{ "setKinematic", w_RigidBody_setKinematic },
+	{ "translate", w_RigidBody_translate },
 	{ "getLinearVelocity", w_RigidBody_getLinearVelocity },
 	{ "setLinearVelocity", w_RigidBody_setLinearVelocity },
 	{ 0, 0 }

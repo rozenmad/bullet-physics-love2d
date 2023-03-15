@@ -2,7 +2,7 @@
 #define LOVE_PHYSICS3D_BT_WRAP_GHOSTOBJECT_H
 
 // LOVE
-#include "common/runtime.h"
+#include "../love_luapi/runtime.h"
 #include "GhostObject.h"
 
 namespace love

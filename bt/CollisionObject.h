@@ -1,12 +1,13 @@
 #ifndef LOVE_PHYSICS3D_BT_COLLISIONOBJECT_H
 #define LOVE_PHYSICS3D_BT_COLLISIONOBJECT_H
 
-#include "common/Object.h"
-#include "common/runtime.h"
-#include "common/Reference.h"
+#include "../love_luapi/Object.h"
+#include "../love_luapi/runtime.h"
+#include "../love_luapi/Reference.h"
+#include "../love_luapi/StringMap.h"
 
 #include "btBulletDynamicsCommon.h"
-#include "Shape.h"
+#include "shapes/Shape.h"
 
 namespace love
 {
@@ -29,36 +30,51 @@ class CollisionObject : public Object {
 public:
 	friend class World;
 
+	enum ContactNames {
+		START_CONTACT,
+		ONGOING_CONTACT,
+		END_CONTACT,
+		CONTACT_MAX_ENUM,
+	};
+
 	static love::Type type;
 
 	struct ContactCallback {
 		Reference *reference = nullptr;
 		lua_State *L = nullptr;
 
-		int report(World *world, ContactPair &pair, bool swapbody = false);
+		int report(World *world, ContactPair &pair);
 	};
 
-	CollisionObject(btCollisionObject *collision_object, Shape *shape);
-	virtual ~CollisionObject();
-	
-	void getTransform(btScalar *a16) const;
-	void setTransform(btScalar *a16);
+	void getTransform(lua_State *L, int idx) const;
+	void setTransform(lua_State *L, int idx);
 
 	int setUserData(lua_State *L);
 	int getUserData(lua_State *L);
 
-	int setCallbacks(lua_State *L);
+	int setCallback(lua_State *L);
 
-	bool isStatic() const;
-	bool isKinematic() const;
-	bool isStaticOrKinematic() const;
+	CollisionObject(btCollisionObject *collision_object, Shape *shape);
+	virtual ~CollisionObject();
+
+	const btVector3 &getAnisotropicFriction() const;
+	void setAnisotropicFriction(btVector3 const &anisotropicFriction);
+	bool hasAnisotropicFriction() const;
+
+	void setContactProcessingThreshold(btScalar contactProcessingThreshold);
+	btScalar getContactProcessingThreshold() const;
+
+	bool isStaticObject() const;
+	bool isKinematicObject() const;
+	bool isStaticOrKinematicObject() const;
+	
+	bool hasContactResponse() const;
+
+	void setCollisionShape(Shape *collisionShape);
+	Shape *getCollisionShape();
 
 	void activate(bool force) const;
 	bool isActive() const;
-
-	void setAnisotropicFriction(btVector3 const &anisotropicFriction);
-	 
-	void setContactProcessingThreshold(btScalar value);
 	 
 	void setRestitution(btScalar value);
 	void setFriction(btScalar value);
@@ -71,13 +87,6 @@ public:
 	void setCcdSweptSphereRadius(btScalar value);
 
 	void setCcdMotionThreshold(btScalar value);
-
-	const btVector3 &getAnisotropicFriction() const;
-	bool hasAnisotropicFriction() const;
-
-	Shape *getCollisionShape();
-	
-	btScalar getContactProcessingThreshold() const;
 
 	btScalar getRestitution() const;
 	btScalar getFriction() const;
@@ -94,14 +103,25 @@ public:
 	
 	bool canCollideWith(CollisionObject const *other) const;
 
+	static bool getContactConstant(const char *in, ContactNames &out);
+	static bool getContactConstant(ContactNames in, const char *&out);
+	static std::vector<std::string> getContactConstants(ContactNames);
+
+	btCollisionObject *getCollisionObject() {
+		return collision_object;
+	}
+
 protected:
 	btCollisionObject *collision_object;
 	World *world;
 
 	UserData *userdata;
-	ContactCallback contact_beg, contact_ong, contact_end;
+	ContactCallback contacts[3];
 
 	StrongRef<Shape> shape_reference;
+
+	static StringMap<ContactNames, CONTACT_MAX_ENUM>::Entry contactNamesEntries[];
+	static StringMap<ContactNames, CONTACT_MAX_ENUM> contactNames;
 };
 
 } // bt

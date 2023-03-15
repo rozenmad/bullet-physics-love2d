@@ -2,9 +2,9 @@
 #define LOVE_PHYSICS3D_BT_PHYSICS3D_H
 
 // LOVE
-#include "common/Module.h"
-#include "common/runtime.h"
-#include "common/Reference.h"
+#include "../love_luapi/Module.h"
+#include "../love_luapi/runtime.h"
+#include "../love_luapi/Reference.h"
 
 #include "btBulletDynamicsCommon.h"
 
@@ -23,6 +23,7 @@ public:
 	virtual ModuleType getModuleType() const { return M_PHYSICS3D; }
 
 	static inline btVector3 parse_btVector3(lua_State *L, int idx);
+	static inline void parse_btTransform(lua_State *L, int idx, btTransform &t);
 
 private:
 
@@ -44,6 +45,18 @@ inline btVector3 Physics3D::parse_btVector3(lua_State *L, int idx) {
 		luaL_error(L, "Argument #%d must be {x, y, z} table.", idx-1);
 	}
 	return v;
+}
+
+inline void Physics3D::parse_btTransform(lua_State *L, int idx, btTransform &t) {
+	btScalar a16[16];
+	if( lua_istable(L, idx) ) {
+		for( int i = 0; i < 16; i++ ) {
+			lua_rawgeti(L, idx, i+1);
+			a16[i] = (float)luaL_checknumber(L, -1);
+			lua_pop(L, 1);
+		}
+	}
+	t.setFromOpenGLMatrix(a16);
 }
 
 } // bt

@@ -1,7 +1,7 @@
 #ifndef LOVE_PHYSICS3D_BT_CHARACTERCONTROLLER_H
 #define LOVE_PHYSICS3D_BT_CHARACTERCONTROLLER_H
 
-#include "common/Object.h"
+#include "../love_luapi/Object.h"
 
 #include "btBulletDynamicsCommon.h"
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
@@ -24,7 +24,12 @@ public:
     CharacterController(GhostObject *ghost_object, btScalar step_height, btVector3 const &up);
     virtual ~CharacterController();
 
+    void setJumpSpeed(btScalar jumpSpeed);
+    btScalar getJumpSpeed() const;
+
     void jump(const btVector3 &v = btVector3(0, 0, 0));
+
+    void applyImpulse(const btVector3 &v);
 
    	void setWalkDirection(const btVector3 &direction);
 
@@ -35,6 +40,11 @@ public:
     void setMaxJumpHeight(btScalar value);
 
     void setMaxPenetrationDepth(btScalar value);
+
+    void setVelocityForTimeInterval(const btVector3 &velocity, btScalar timeInterval);
+
+    void setStepHeight(btScalar h);
+    btScalar getStepHeight() const;
 
     btScalar getMaxPenetrationDepth() const;
 

@@ -1,8 +1,5 @@
 #include "Physics3D.h"
 
-// LOVE
-#include "common/math.h"
-
 namespace love
 {
 namespace physics3d

@@ -1,7 +1,7 @@
 #ifndef LOVE_PHYSICS3D_BT_CONTACTPOINTS_H
 #define LOVE_PHYSICS3D_BT_CONTACTPOINTS_H
 
-#include "common/Object.h"
+#include "../love_luapi/Object.h"
 #include "btBulletDynamicsCommon.h"
 
 namespace love

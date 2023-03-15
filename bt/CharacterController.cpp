@@ -1,5 +1,5 @@
 #include "CharacterController.h"
-#include "common/Exception.h"
+#include "../love_luapi/Exception.h"
 
 namespace love
 {
@@ -25,39 +25,78 @@ CharacterController::~CharacterController() {
     delete kinematic_character_controller;
 }
 
-void CharacterController::jump(const btVector3 &v) {
+void
+CharacterController::setJumpSpeed(btScalar jumpSpeed) {
+	kinematic_character_controller->setJumpSpeed(jumpSpeed);
+}
+
+btScalar
+CharacterController::getJumpSpeed() const {
+	return kinematic_character_controller->getJumpSpeed();
+}
+
+void
+CharacterController::jump(const btVector3 &v) {
 	kinematic_character_controller->jump(v);
 }
 
-void CharacterController::setWalkDirection(const btVector3 &direction) {
+void
+CharacterController::applyImpulse(const btVector3 &v) {
+	kinematic_character_controller->applyImpulse(v);
+}
+
+void 
+CharacterController::setWalkDirection(const btVector3 &direction) {
 	kinematic_character_controller->setWalkDirection(direction);
 }
 
-void CharacterController::setGravity(const btVector3 &gravity) {
+void 
+CharacterController::setGravity(const btVector3 &gravity) {
 	kinematic_character_controller->setGravity(gravity);
 }
 
-void CharacterController::setUp(const btVector3 &up) {
+void 
+CharacterController::setUp(const btVector3 &up) {
 	kinematic_character_controller->setUp(up);
 }
 
-void CharacterController::setMaxJumpHeight(btScalar value) {
+void 
+CharacterController::setMaxJumpHeight(btScalar value) {
 	kinematic_character_controller->setMaxJumpHeight(value);
 }
 
-void CharacterController::setMaxPenetrationDepth(btScalar value) {
+void 
+CharacterController::setVelocityForTimeInterval(const btVector3 &velocity, btScalar timeInterval) {
+	kinematic_character_controller->setVelocityForTimeInterval(velocity, timeInterval);
+}
+
+void
+CharacterController::setStepHeight(btScalar h) {
+	kinematic_character_controller->setStepHeight(h);
+}
+
+btScalar
+CharacterController::getStepHeight() const {
+	return kinematic_character_controller->getStepHeight();
+}
+
+void 
+CharacterController::setMaxPenetrationDepth(btScalar value) {
 	kinematic_character_controller->setMaxPenetrationDepth(value);
 }
 
-btScalar CharacterController::getMaxPenetrationDepth() const {
+btScalar 
+CharacterController::getMaxPenetrationDepth() const {
 	return kinematic_character_controller->getMaxPenetrationDepth();
 }
 
-GhostObject *CharacterController::getGhostObject() {
+GhostObject *
+CharacterController::getGhostObject() {
 	return ghost_object_reference.get();
 }
 
-bool CharacterController::onGround() const {
+bool 
+CharacterController::onGround() const {
 	return kinematic_character_controller->onGround();
 }
 

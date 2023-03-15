@@ -2,8 +2,8 @@
 #define LOVE_PHYSICS3D_BT_WRAP_WORLD_H
 
 // LOVE
-#include "common/runtime.h"
-#include "common/Exception.h"
+#include "../love_luapi/runtime.h"
+#include "../love_luapi/Exception.h"
 #include "World.h"
 
 namespace love

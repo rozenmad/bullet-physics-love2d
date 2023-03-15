@@ -2,7 +2,7 @@
 #define LOVE_PHYSICS3D_BT_WRAP_CHARACTERCONTROLLER_H
 
 // LOVE
-#include "common/runtime.h"
+#include "../love_luapi/runtime.h"
 #include "CharacterController.h"
 
 namespace love

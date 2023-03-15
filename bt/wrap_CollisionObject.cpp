@@ -1,5 +1,6 @@
 #include "wrap_CollisionObject.h"
 #include "Physics3D.h"
+#include "shapes/wrap_Shape.h"
 
 namespace love
 {
@@ -12,35 +13,90 @@ CollisionObject *luax_checkcollisionobject(lua_State *L, int idx) {
 	return luax_checktype<CollisionObject>(L, idx);
 }
 
+int w_CollisionObject_getAnisotropicFriction(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	const btVector3 &v = object->getAnisotropicFriction();
+	lua_pushnumber(L, v.x());
+	lua_pushnumber(L, v.y());
+	lua_pushnumber(L, v.z());
+	return 3;
+}
+
+int w_CollisionObject_setAnisotropicFriction(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	btVector3 factor = Physics3D::parse_btVector3(L, 2);
+	object->setAnisotropicFriction(factor);
+	return 0;
+}
+
+int w_CollisionObject_hasAnisotropicFriction(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushboolean(L, object->hasAnisotropicFriction());
+	return 1;
+}
+
+int w_CollisionObject_setContactProcessingThreshold(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	float value = (float)luaL_checknumber(L, 2);
+	object->setContactProcessingThreshold(value);
+	return 0;
+}
+
+int w_CollisionObject_getContactProcessingThreshold(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushnumber(L, object->getContactProcessingThreshold());
+	return 1;
+}
+
+int w_CollisionObject_isStaticObject(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushboolean(L, object->isStaticObject());
+	return 1;
+}
+
+int w_CollisionObject_isKinematicObject(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushboolean(L, object->isKinematicObject());
+	return 1;
+}
+
+int w_CollisionObject_isStaticOrKinematicObject(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushboolean(L, object->isStaticOrKinematicObject());
+	return 1;
+}
+
+int w_CollisionObject_hasContactResponse(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	lua_pushboolean(L, object->hasContactResponse());
+	return 1;
+}
+
+int w_CollisionObject_setCollisionShape(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	Shape *shape = luax_checkshape(L, 2);
+	object->setCollisionShape(shape);
+	return 0;
+}
+
+int w_CollisionObject_getCollisionShape(lua_State *L) {
+	CollisionObject *object = luax_checkcollisionobject(L, 1);
+	luax_pushtype(L, object->getCollisionShape());
+	return 1;
+}
+
+
 int w_CollisionObject_getTransform(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	btScalar a16[16];
-	object->getTransform(a16);
-	int idx = 2;
-	if( lua_istable(L, idx) ) {
-		for( int i = 0; i < 16; i++ ) {
-			lua_pushnumber(L, a16[i]);
-			lua_rawseti(L, idx, i+1);
-		}
-	}
+	object->getTransform(L, 2);
 	return 0;
 }
 
 int w_CollisionObject_setTransform(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	btScalar a16[16];
-	int idx = 2;
-	if( lua_istable(L, idx) ) {
-		for( int i = 0; i < 16; i++ ) {
-			lua_rawgeti(L, idx, i+1);
-			a16[i] = (float)luaL_checknumber(L, -1);
-			lua_pop(L, 1);
-		}
-		object->setTransform(a16);
-	}
+	object->setTransform(L, 2);
 	return 0;
 }
-
 
 int w_CollisionObject_setUserData(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
@@ -54,10 +110,10 @@ int w_CollisionObject_getUserData(lua_State *L) {
 	return object->getUserData(L);
 }
 
-int w_CollisionObject_setCallbacks(lua_State *L) {
+int w_CollisionObject_setCallback(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_remove(L, 1);
-	return object->setCallbacks(L);
+	return object->setCallback(L);
 }
 
 int w_CollisionObject_activate(lua_State *L) {
@@ -71,20 +127,6 @@ int w_CollisionObject_isActive(lua_State *L) {
 	CollisionObject *object = luax_checkcollisionobject(L, 1);
 	lua_pushboolean(L, object->isActive());
 	return 1;
-}
-
-int w_CollisionObject_setAnisotropicFriction(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	btVector3 factor = Physics3D::parse_btVector3(L, 2);
-	object->setAnisotropicFriction(factor);
-	return 0;
-}
-
-int w_CollisionObject_setContactProcessingThreshold(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	float value = (float)luaL_checknumber(L, 2);
-	object->setContactProcessingThreshold(value);
-	return 0;
 }
 
 int w_CollisionObject_setRestitution(lua_State *L) {
@@ -142,33 +184,6 @@ int w_CollisionObject_setCcdMotionThreshold(lua_State *L) {
 	float value = (float)luaL_checknumber(L, 2);
 	object->setCcdMotionThreshold(value);
 	return 0;
-}
-
-int w_CollisionObject_getAnisotropicFriction(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	const btVector3 &v = object->getAnisotropicFriction();
-	lua_pushnumber(L, v.x());
-	lua_pushnumber(L, v.y());
-	lua_pushnumber(L, v.z());
-	return 3;
-}
-
-int w_CollisionObject_hasAnisotropicFriction(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	lua_pushboolean(L, object->hasAnisotropicFriction());
-	return 1;
-}
-
-int w_CollisionObject_getCollisionShape(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	luax_pushtype(L, object->getCollisionShape());
-	return 1;
-}
-
-int w_CollisionObject_getContactProcessingThreshold(lua_State *L) {
-	CollisionObject *object = luax_checkcollisionobject(L, 1);
-	lua_pushnumber(L, object->getContactProcessingThreshold());
-	return 1;
 }
 
 int w_CollisionObject_getRestitution(lua_State *L) {
@@ -240,15 +255,24 @@ int w_CollisionObject_canCollideWith(lua_State *L) {
 
 static const luaL_Reg w_CollisionObject_functions[] =
 {
+	{ "getAnisotropicFriction", w_CollisionObject_getAnisotropicFriction },
+	{ "setAnisotropicFriction", w_CollisionObject_setAnisotropicFriction },
+	{ "hasAnisotropicFriction", w_CollisionObject_hasAnisotropicFriction },
+
+	{ "setContactProcessingThreshold", w_CollisionObject_setContactProcessingThreshold },
+	{ "getContactProcessingThreshold", w_CollisionObject_getContactProcessingThreshold },
+
+	{ "isStaticObject", w_CollisionObject_isStaticObject },
+	{ "isKinematicObject", w_CollisionObject_isKinematicObject },
+	{ "isStaticOrKinematicObject", w_CollisionObject_isStaticOrKinematicObject },
+
 	{ "getTransform", w_CollisionObject_getTransform },
 	{ "setTransform", w_CollisionObject_setTransform },
 	{ "setUserData", w_CollisionObject_setUserData },
 	{ "getUserData", w_CollisionObject_getUserData },
-	{ "setCallbacks", w_CollisionObject_setCallbacks },
+	{ "setCallback", w_CollisionObject_setCallback },
 	{ "activate", w_CollisionObject_activate },
 	{ "isActive", w_CollisionObject_isActive },
-	{ "setAnisotropicFriction", w_CollisionObject_setAnisotropicFriction },
-	{ "setContactProcessingThreshold", w_CollisionObject_setContactProcessingThreshold },
 	{ "setRestitution", w_CollisionObject_setRestitution },
 	{ "setFriction", w_CollisionObject_setFriction },
 	{ "setRollingFriction", w_CollisionObject_setRollingFriction },
@@ -257,10 +281,7 @@ static const luaL_Reg w_CollisionObject_functions[] =
 	{ "setHitFraction", w_CollisionObject_setHitFraction },
 	{ "setCcdSweptSphereRadius", w_CollisionObject_setCcdSweptSphereRadius },
 	{ "setCcdMotionThreshold", w_CollisionObject_setCcdMotionThreshold },
-	{ "getAnisotropicFriction", w_CollisionObject_getAnisotropicFriction },
-	{ "hasAnisotropicFriction", w_CollisionObject_hasAnisotropicFriction },
 	{ "getCollisionShape", w_CollisionObject_getCollisionShape },
-	{ "getContactProcessingThreshold", w_CollisionObject_getContactProcessingThreshold },
 	{ "getRestitution", w_CollisionObject_getRestitution },
 	{ "getFriction", w_CollisionObject_getFriction },
 	{ "getRollingFriction", w_CollisionObject_getRollingFriction },

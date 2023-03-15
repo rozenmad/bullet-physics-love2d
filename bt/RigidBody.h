@@ -1,12 +1,12 @@
 #ifndef LOVE_PHYSICS3D_BT_RIGIDBODY_H
 #define LOVE_PHYSICS3D_BT_RIGIDBODY_H
 
-#include "common/Object.h"
-#include "common/runtime.h"
-#include "common/Reference.h"
+#include "../love_luapi/Object.h"
+#include "../love_luapi/runtime.h"
+#include "../love_luapi/Reference.h"
 #include "btBulletDynamicsCommon.h"
 
-#include "Shape.h"
+#include "shapes/Shape.h"
 #include "CollisionObject.h"
 
 namespace love
@@ -41,8 +41,11 @@ public:
 	RigidBody(Shape *shape, float mass, lua_State *L);
 	virtual ~RigidBody();
 
+	void applyGravity();
+
 	void setDamping(btScalar linear, btScalar angular);
 
+	void applyCentralForce(btVector3 const &force);
 	void applyForce(btVector3 const &force, btVector3 const &rel_pos);
 
 	void setAngularFactor(const btVector3 &factor);
@@ -50,6 +53,8 @@ public:
 	void setLinearFactor(const btVector3 &factor);
 
 	void setKinematic(bool enable = true);
+
+	void translate(const btVector3 &v);
 
 	const btVector3 &getLinearVelocity() const;
 	void setLinearVelocity(btVector3 const &v);

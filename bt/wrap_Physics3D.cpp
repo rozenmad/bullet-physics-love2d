@@ -3,15 +3,18 @@
 
 #include "wrap_World.h"
 #include "wrap_RigidBody.h"
-#include "wrap_Shape.h"
-#include "wrap_BoxShape.h"
-#include "wrap_CapsuleShape.h"
-#include "wrap_TriangleMeshShape.h"
 #include "wrap_ContactPoint.h"
 #include "wrap_CollisionObject.h"
 #include "wrap_GhostObject.h"
 #include "wrap_CharacterController.h"
 #include "wrap_RaycastHit.h"
+#include "callback/wrap_KinematicCallback.h"
+
+#include "shapes/wrap_Shape.h"
+#include "shapes/wrap_BoxShape.h"
+#include "shapes/wrap_CapsuleShape.h"
+#include "shapes/wrap_SphereShape.h"
+#include "shapes/wrap_TriangleMeshShape.h"
 
 namespace love
 {
@@ -80,6 +83,16 @@ int w_newCapsuleShape(lua_State *L) {
 	return 1;
 }
 
+int w_newSphereShape(lua_State *L) {
+	float radius = (float)luaL_checknumber(L, 1);
+
+	SphereShape *shape;
+	luax_catchexcept(L, [&](){ shape = new SphereShape(radius); });
+	luax_pushtype(L, shape);
+	shape->release();
+	return 1;
+}
+
 int w_newTriangleMeshShape(lua_State *L) {
 	if( lua_istable(L, 1) ) {
 		TriangleMeshShape *shape;
@@ -104,6 +117,18 @@ int w_newCharacterController(lua_State *L) {
 	return 1;
 }
 
+int w_newKinematicCallback(lua_State *L) {
+	CollisionObject *collision_object = luax_checkcollisionobject(L, 1);
+	btVector3 up = Physics3D::parse_btVector3(L, 2);
+	float max_slope = (float)luaL_checknumber(L, 3);
+
+	KinematicCallback *kinematic_callback;
+	luax_catchexcept(L, [&](){ kinematic_callback = new KinematicCallback(collision_object->getCollisionObject(), up, max_slope); });
+	luax_pushtype(L, kinematic_callback);
+	kinematic_callback->release();
+	return 1;
+}
+
 // List of functions to wrap.
 static const luaL_Reg functions[] =
 {
@@ -112,8 +137,10 @@ static const luaL_Reg functions[] =
 	{ "newRigidBody", w_newRigidBody },
 	{ "newBoxShape", w_newBoxShape },
 	{ "newCapsuleShape", w_newCapsuleShape },
+	{ "newSphereShape", w_newSphereShape },
 	{ "newTriangleMeshShape", w_newTriangleMeshShape },
 	{ "newCharacterController", w_newCharacterController },
+	{ "newKinematicCallback", w_newKinematicCallback },
 	{ 0, 0 }
 };
 
@@ -126,10 +153,12 @@ static const lua_CFunction types[] =
 	luaopen_bt_boxshape,
 	luaopen_bt_trianglemeshshape,
 	luaopen_bt_capsuleshape,
+	luaopen_bt_sphereshape,
 	luaopen_bt_contactpoint,
 	luaopen_bt_collisionobject,
 	luaopen_bt_charactercontroller,
 	luaopen_bt_raycasthit,
+	luaopen_bt_kinematiccallback,
 	0
 };
 

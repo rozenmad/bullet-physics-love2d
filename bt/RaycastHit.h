@@ -1,7 +1,7 @@
 #ifndef LOVE_PHYSICS3D_BT_RAYCASTHIT_H
 #define LOVE_PHYSICS3D_BT_RAYCASTHIT_H
 
-#include "common/Object.h"
+#include "../love_luapi/Object.h"
 #include "btBulletDynamicsCommon.h"
 #include "CollisionObject.h"
 

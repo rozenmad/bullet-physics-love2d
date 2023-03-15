@@ -2,7 +2,7 @@
 #define LOVE_PHYSICS3D_BT_WRAP_CONTACTPOINT_H
 
 // LOVE
-#include "common/runtime.h"
+#include "../love_luapi/runtime.h"
 #include "ContactPoint.h"
 
 namespace love

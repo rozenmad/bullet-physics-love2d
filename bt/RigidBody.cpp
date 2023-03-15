@@ -54,6 +54,8 @@ btRigidBody *RigidBody::create_bt_rigid_body(Shape *shape, float mass, lua_State
 
 	btRigidBody::btRigidBodyConstructionInfo c_info(mass, motion_state, bt_shape, local_inertia);
 	rbody = new btRigidBody(c_info);
+
+	//setTransform(L, lua_gettop(L));
 	return rbody;
 }
 
@@ -68,8 +70,16 @@ RigidBody::~RigidBody() {
 	delete motion_state;
 }
 
+void RigidBody::applyGravity() {
+	rbody->applyGravity();
+}
+
 void RigidBody::setDamping(btScalar linear, btScalar angular) {
 	rbody->setDamping(linear, angular);
+}
+
+void RigidBody::applyCentralForce(btVector3 const &force) {
+	rbody->applyCentralForce(force);
 }
 
 void RigidBody::applyForce(btVector3 const &force, btVector3 const &rel_pos) {
@@ -87,11 +97,15 @@ void RigidBody::setLinearFactor(const btVector3 &factor) {
 void RigidBody::setKinematic(bool enable) {
 	int flags = rbody->getCollisionFlags();
 	if( enable ) {
-	    rbody->setCollisionFlags(flags | btCollisionObject::CF_KINEMATIC_OBJECT);
+		rbody->setCollisionFlags(flags | btCollisionObject::CF_KINEMATIC_OBJECT);
 	} else {
 		rbody->setCollisionFlags(flags &~btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
-    rbody->forceActivationState(enable ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
+	rbody->forceActivationState(enable ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
+}
+
+void RigidBody::translate(const btVector3 &v) {
+	rbody->translate(v);
 }
 
 const btVector3 &RigidBody::getLinearVelocity() const {

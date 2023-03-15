@@ -2,7 +2,7 @@
 #define LOVE_PHYSICS3D_BT_WRAP_PHYSICS3D_H
 
 // LOVE
-#include "common/config.h"
+#include "../love_luapi/config.h"
 
 namespace love
 {
