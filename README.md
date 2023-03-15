@@ -2,11 +2,12 @@
 
 Bullet Physics for LÖVE, in development.
 
-__API:__
 How to use:
 ``` lua
 local love_bullet = require 'love_bullet'
 ```
+
+__API:__
 
 ##### World
 ``` lua
