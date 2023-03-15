@@ -3,6 +3,11 @@
 Bullet Physics for LÖVE, in development.
 
 __API:__
+How to use:
+``` lua
+local love_bullet = require 'love_bullet'
+```
+
 ##### World
 ``` lua
 local world = love.physics3d.newWorld(gx, gy, gz)
